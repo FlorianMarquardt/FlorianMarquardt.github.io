@@ -1,0 +1,226 @@
+<html>
+<title>Newton's laws: Many stars in your browser</title>
+<style>
+#button {
+	background-color:#00AA80;
+	text-align:center;
+	border-radius:5px;
+	font-family:Verdana;
+	padding:3px;
+}
+#button:hover {
+	background-color:#FF8000
+}
+#grav_slider {
+	background-color:#00AA80;
+	border-radius:5px;
+	font-family:Verdana;
+	padding:3px;
+}
+</style>
+
+<body style="margin:0; background-color:#000000">
+
+<!-- 
+First: the panel on the left, onto which the animation will be drawn.
+Scripts are at the end of this page!
+--->
+
+<div style="width:70%;float:left">
+	<svg id="canvas" viewBox="0 0 100 100">
+<rect x="5" y="5" width="90" height="90" style="stroke-width:3;stroke:rgb(0,100,200)"/>
+		</svg>
+</div>
+
+<!-- 
+And now: the text!
+--->
+
+<div style="float:left;width:25%;height:100%;background-color:#000000;font-family:Georgia;color:#FFFFFF;padding:10px">
+
+	<p style="font-size:48">
+Newton's laws
+	</p>
+
+	<p id="num_stars" style="font-size:14;color:#00CBDE">50 stars</p>
+
+	<p id="button" onclick="more_particles()">More stars</p>
+	<p id="button" onclick="less_particles()">Fewer stars</p>
+
+	<div id="grav_slider">
+	<label>Gravity </label>
+	<input id="gravity_input" type="range" min="0" max="100" value="10" class="slider" onchange="change_gravity()">
+	</div>
+
+	<p style="font-size:14;color:#00CBDE">
+Use the mouse wheel on the simulation area shown to the left in order to zoom out or in. Drag to move the view.
+	</p>
+
+	<p>
+Newton's equations of motion tell us how bodies move, for example under the influence of their mutual gravitational attraction.
+	</p>
+
+	<p>
+This animation is actually a real simulation: It solves Newton's equations of motion for a bunch of stars (in three-dimensional space), inside your browser!</p>
+
+	<p>
+From the modern perspective, Newton's equations are not very complicated. In your browser, these are just two dozen lines of code.
+	</p>
+
+	<svg viewBox="0 0 200 40" style="margin:auto">
+		<circle cx="50" cy="20" r="15" fill="#FFFF00"/>
+		<circle cx="90" cy="20" r="3"  fill="#FFB000"/>
+		<circle cx="105" cy="20" r="5"  fill="#BBB0AA"/>
+		<circle cx="120" cy="20" r="5"  fill="#0090FF"/>
+	</svg>
+
+
+	<p style="font-size:14;color:#00CBDE">Florian Marquardt 2020</p>
+</div>
+
+<script>
+function circle(x, y, r,color, canvas_id) {
+	var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
+	shape.setAttribute ('cx', x)
+	shape.setAttribute ('cy', y)
+	shape.setAttribute ('r', r)
+	shape.setAttribute('fill',color)
+	shape.setAttribute('fill-opacity',0.7)
+	document.getElementById(canvas_id).appendChild(shape)
+	return(shape)
+}
+
+function more_particles() {
+	num_stars+=50
+	init_all()
+	
+}
+
+function less_particles() {
+	if(num_stars>50) {
+		num_stars-=50
+	}
+	init_all()
+}
+
+function change_gravity() {
+	G=0.01*document.getElementById('gravity_input').value
+}
+
+CX=50
+CY=50
+
+function randn() { // Gaussian random number
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while(v === 0) v = Math.random();
+    return( Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v ) );
+}
+
+function init_all() {
+	if(old_num_stars>0) { // delete old stars
+		for(j=0;j<old_num_stars;j++) {
+			star[j].remove()
+		}
+	}
+	old_num_stars=num_stars
+
+	// make new stars
+	XSCALE=30
+	VSCALE=1.0
+	rSCALE=3.0
+	X=Array.from({length: num_stars}, () => XSCALE*randn() )
+	Y=Array.from({length: num_stars}, () => XSCALE*randn() )
+	Z=Array.from({length: num_stars}, () => XSCALE*randn() )
+	VX=Array.from({length: num_stars}, () => VSCALE*randn() )
+	VY=Array.from({length: num_stars}, () => VSCALE*randn() )
+	VZ=Array.from({length: num_stars}, () => VSCALE*randn() )
+	r=Array.from({length: num_stars}, () => 1+rSCALE*Math.random() )
+	m=Array(num_stars)
+	star=Array(num_stars)
+
+	color_factor=255/num_stars
+
+	for(j=0;j<num_stars;j++) {
+		star[j]=circle(CX+X[j],CY+Y[j], r[j], 'rgb('+j*color_factor+',150,0)','canvas')
+		m[j]=Math.pow(r[j],3)
+	}
+
+	plot_scale=1.0
+	document.getElementById("num_stars").innerHTML=num_stars+" stars"
+}
+
+old_num_stars=0
+num_stars=50
+init_all()
+
+
+DT=0.1
+G=.1
+plot_scale=1.0
+
+function animate() {
+	// getting all the forces (scales like num_stars squared!)
+	for(j=0;j<num_stars-1;j++) {
+		for(k=j+1;k<num_stars;k++) {
+			var x=X[k]-X[j]
+			var y=Y[k]-Y[j]
+			var z=Z[k]-Z[j]
+			R32=Math.pow(0.01+x*x+y*y+z*z,1.5)
+			F0=G*m[j]*m[k]
+			FX=F0*x/R32
+			FY=F0*y/R32
+			FZ=F0*z/R32
+			VX[j]+=DT*FX/m[j]
+			VY[j]+=DT*FY/m[j]
+			VZ[j]+=DT*FZ/m[j]
+			VX[k]-=DT*FX/m[k]
+			VY[k]-=DT*FY/m[k]
+			VZ[k]-=DT*FZ/m[k]
+		}
+	}
+
+	for(j=0;j<num_stars;j++) {
+		X[j]+=DT*VX[j]
+		Y[j]+=DT*VY[j]
+		Z[j]+=DT*VZ[j]
+		star[j].setAttribute('cx',CX+plot_scale*X[j])
+		star[j].setAttribute('cy',CY+plot_scale*Y[j])
+	}
+}
+
+setInterval(animate,30)
+
+
+function mouseWheel(e) {
+	if(e.deltaY>0) {
+		factor=1.01
+	} else {
+		factor=1/1.01
+	}
+	plot_scale*=factor
+	CX-=50; CY-=50;
+	CX*=factor; CY*=factor;
+	CX+=50; CY+=50;
+	for(j=0;j<num_stars;j++) {
+		r[j]*=factor
+		star[j].setAttribute('r',r[j])
+	}
+	e.preventDefault() // stop whole page from scrolling
+}
+
+function mouseMove(e) {
+	if(e.buttons>0) {
+		CX+=0.2*e.movementX
+		CY+=0.2*e.movementY
+	}
+}
+
+document.getElementById('canvas').addEventListener('wheel', mouseWheel)
+document.getElementById('canvas').addEventListener('mousemove', mouseMove)
+
+</script>
+
+
+</body>
+</html>
