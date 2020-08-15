@@ -1,0 +1,42 @@
+<html>
+<title>
+Kepler
+</title>
+<body>
+
+<svg id="canvas" viewBox="0 0 100 100">
+<rect x="0" y="0" width="100%" height="100%" fill="#000000">
+</svg>
+
+
+<script>
+function circle (x, y, r,color) {
+	var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
+	shape.setAttribute ('cx', x)
+	shape.setAttribute ('cy', y)
+	shape.setAttribute ('r', r)
+	shape.setAttribute('fill',color)
+	document.getElementById ('canvas').appendChild(shape)
+	return(shape)
+};
+
+CX=50
+CY=50
+R=20
+r=5
+angle=1.5
+
+planet=circle(50,50,r,'rgb(255,150,0)')
+sun=circle(50,50,  10,'rgb(255,255,0)')
+
+function animate() {
+	planet.setAttribute('cx',CX+R*Math.cos(angle))
+	planet.setAttribute('cy',CY+R*Math.sin(angle))
+	angle+=0.01
+}
+
+setInterval(animate,20)
+</script>
+
+</body>
+</html>
