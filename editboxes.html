@@ -1,0 +1,76 @@
+<html>
+    <title>
+        Minimal example of producing and positioning live some svg text according to text input
+    </title>
+    <!-- (C) 2020 by Florian Marquardt; MIT License -->
+    <body style="margin:0px">
+        <div style="float:left;width:50%;background-color:burlywood">
+            <svg id="canvas" viewBox="0 0 100 100" style="width:100%;height:100%">
+            </svg>
+        </div>
+        <div style="float:left;width:50%;">
+            <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:24" oninput="text_changed()">
+Enter labels and coordinates like this:
+(Electron|10|50)
+(Proton|30|20)
+(Neutron|20|80)</textarea>
+        </div>
+
+        <script>
+            
+            function text_changed() {
+                txt_field=document.getElementById ('inputarea')
+                txt=txt_field.value
+                if(boxes.length>0) { // delete old boxes from svg canvas
+                    for(j=0;j<boxes.length;j++) {
+                        boxes[j].remove()
+                    }
+                }
+                boxes=new Array() // empty array
+                var patt = /\(([^|]+)\|([^|]+)\|([^)]+)\)/g
+                do {
+                    matches=patt.exec(txt)
+                    go_on=false
+                    if(matches) {
+                        if(matches.length>=4) {
+                            str=matches[1]
+                            x=parseFloat(matches[2])
+                            y=parseFloat(matches[3])
+                            if(!isNaN(x) && !isNaN(y)) {
+                                boxes.push(text(x,y,str)) // new box
+                            }
+                            go_on=true
+                        }
+                    }
+                } while(go_on)
+
+            }
+
+            function circle (x, y, r,color) {
+                var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
+                shape.setAttribute ('cx', x)
+                shape.setAttribute ('cy', y)
+                shape.setAttribute ('r', r)
+                shape.setAttribute('fill',color)
+                document.getElementById ('canvas').appendChild(shape)
+                return(shape)
+            }
+
+            function text(x,y,str) {
+                var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+                shape.setAttribute ('x', x)
+                shape.setAttribute ('y', y)
+                shape.setAttribute('fill','black')
+                shape.setAttribute('color','white')
+                shape.textContent=str
+                document.getElementById ('canvas').appendChild(shape)
+                return(shape)
+            }
+
+            // init:
+            planet=circle(50,50,10,'rgb(200,0,0)')
+            boxes=new Array()
+            text_changed()
+        </script>
+    </body>
+</html>
