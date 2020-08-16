@@ -1,0 +1,139 @@
+<html>
+    <title>
+        Live text: dragging object and updating their positions in the text
+    </title>
+    <!-- (C) 2020 by Florian Marquardt; MIT License -->
+    <body style="margin:0px">
+        <div style="float:left;width:50%;background-color:rebeccapurple">
+            <svg id="canvas" viewBox="0 0 100 100" style="width:100%;height:100%">
+            </svg>
+        </div>
+        <div style="float:left;width:50%;">
+            <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:24" oninput="text_changed()">
+There is a circle at (10|50|tomato) and another one at (80|15|yellow). 
+
+You can add more like that, also with other valid html colors, like (20|80|#FFBB00)!
+
+Now the real fun starts: Drag the circles around and see how the coordinates update in the text!
+
+Code by Florian Marquardt, 2020.
+</textarea>
+        </div>
+
+        <script>
+            
+            function text_changed() { // parse text area to draw circles!
+                txt_field=document.getElementById ('inputarea')
+                txt=txt_field.value
+                if(objects.length>0) { // delete old objects from svg canvas
+                    for(j=0;j<objects.length;j++) {
+                        objects[j].remove()
+                    }
+                }
+                objects=new Array() // empty array
+                var patt = /\(([^|]+)\|([^|]+)\|([^)]+)\)/g
+                do {
+                    matches=patt.exec(txt)
+                    go_on=false
+                    if(matches) {
+                        if(matches.length>=4) {
+                            x=parseFloat(matches[1])
+                            y=parseFloat(matches[2])
+                            str=matches[3]
+                            if(!isNaN(x) && !isNaN(y)) {
+                                var obj=circle(x,y,5,str)
+                                obj.addEventListener("mouseover",mouseOver)
+                                obj.addEventListener("mouseleave",mouseLeave)
+                                obj.addEventListener("mousemove",mouseMove)
+                                // Save reference to where in the text
+                                // the info is located! Need this to
+                                // update it upon drag...
+                                // (we are just adding new properties here
+                                // to the svg circle graphics object...)
+                                obj.text_start=matches.index
+                                obj.text_end=matches.index+matches[0].length
+                                obj.color_str=str
+                                objects.push(obj) // new object
+                            }
+                            go_on=true
+                        }
+                    }
+                } while(go_on)
+
+            }
+
+            function replace_string(old_string,start,stop,new_insertion) {
+                return(old_string.slice(0,start)+new_insertion+old_string.slice(stop))
+            }
+
+            // update the text description of an object inside the text area
+            function update_obj_text(obj) {
+                new_obj_text="("+Math.round(obj.getAttribute('cx'))+"|"+Math.round(obj.getAttribute('cy'))+"|"+obj.color_str+")"
+                txt=replace_string(txt,obj.text_start,obj.text_end,new_obj_text)
+                txt_field.value=txt
+                obj.text_end=obj.text_start+new_obj_text.length
+            }
+
+            function circle (x, y, r,color) {
+                var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
+                shape.setAttribute ('cx', x)
+                shape.setAttribute ('cy', y)
+                shape.setAttribute ('r', r)
+                shape.setAttribute('fill',color)
+                document.getElementById ('canvas').appendChild(shape)
+                return(shape)
+            }
+
+            // mouse entered a circle
+            function mouseOver(evt) {
+                if(current_object) { // we are already dragging something!
+                    return
+                }
+                evt.target.setAttribute("stroke","white")
+                evt.target.setAttribute("stroke-width",1)
+                current_object=evt.target
+                oldpos=null
+            }
+
+            // mouse left
+            function mouseLeave(evt) {
+                if(evt.buttons==0) {
+                    evt.target.setAttribute("stroke",null)
+                    current_object=null
+                }
+            }
+
+            // mouse is moving (means: dragging, if button is down)
+            function mouseMove(evt) {
+                if(evt.buttons>0) {
+                    if(current_object) {
+                        cx=parseFloat(current_object.getAttribute('cx'))
+                        cy=parseFloat(current_object.getAttribute('cy'))
+                        // the most complex thing: properly
+                        // transforming from screen coordinates to
+                        // object coordinates:
+                        var pos = document.getElementById('canvas').createSVGPoint()
+                        pos.x = evt.pageX
+                        pos.y = evt.pageY
+                        var ctm = current_object.getScreenCTM()
+                        if (ctm = ctm.inverse()) {
+                            pos=pos.matrixTransform(ctm)
+                        }
+                        if(oldpos) {
+                            cx+=pos.x-oldpos.x
+                            cy+=pos.y-oldpos.y
+                            current_object.setAttribute('cx',cx) // move it!
+                            current_object.setAttribute('cy',cy)
+                            update_obj_text(current_object) // update text area!
+                        }
+                        oldpos=pos
+                    }
+                }
+            }
+            // init:
+            objects=new Array()
+            text_changed() // parse text for a first time, to show circles
+            current_object=null
+        </script>
+    </body>
+</html>
