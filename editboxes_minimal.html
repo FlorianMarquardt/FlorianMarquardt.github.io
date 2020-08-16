@@ -1,0 +1,48 @@
+<html>
+    <title>
+        Minimal example of editing live an svg graphics using text input
+    </title>
+    <!-- (C) 2020 by Florian Marquardt; MIT License -->
+    <body style="margin:0px">
+        <div style="float:left;width:50%;background-color:burlywood">
+            <svg id="canvas" viewBox="0 0 100 100" style="width:100%;height:100%">
+            </svg>
+        </div>
+        <div style="float:left;width:50%;">
+            <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:24" oninput="text_changed()">
+Enter the coordinates like this:
+(50|50)</textarea>
+        </div>
+
+        <script>
+            
+            function text_changed() {
+                txt_field=document.getElementById ('inputarea')
+                txt=txt_field.value
+                var patt = /\(([^|]+)\|([^)]+)\)/
+                matches=patt.exec(txt)
+                if(matches.length>=3) {
+                    x=parseFloat(matches[1])
+                    y=parseFloat(matches[2])
+                    if(!isNaN(x) && !isNaN(y)) {
+                        planet.setAttribute('cx',x)
+                        planet.setAttribute('cy',y)
+                    }
+                }
+            }
+
+            function circle (x, y, r,color) {
+                var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
+                shape.setAttribute ('cx', x)
+                shape.setAttribute ('cy', y)
+                shape.setAttribute ('r', r)
+                shape.setAttribute('fill',color)
+                document.getElementById ('canvas').appendChild(shape)
+                return(shape)
+            }
+
+            planet=circle(50,50,10,'rgb(200,0,0)')
+            
+        </script>
+    </body>
+</html>
