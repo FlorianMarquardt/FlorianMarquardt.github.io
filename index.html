@@ -21,9 +21,11 @@
 	</style>
 </head>
 
-<body style="background-color:#000000">
+<body style="background-color:#000000;margin:0px">
   
-<div style="font-family:Georgia;color:#FFFFFF;font-size:48">
+	<svg id="canvas" width="100%" height="200">
+	</svg>
+<div style="font-family:Georgia;color:#FFFFFF;font-size:48;margin:30px">
 
   <p>
 Some things just for fun...
@@ -37,7 +39,7 @@ Some things just for fun...
   <a id="button" href="keplers_laws.html">Kepler's Laws (embedded animations)</a>
   </p>
   <p>
-  <a id="button" href="manybody_gravity.html">⭐️Newton's Laws: Many-body simulation right in your browser!</a>
+  <a id="button" href="manybody_gravity.html">💡 Newton's Laws: Many-body simulation right in your browser!</a>
   </p>
 
 <p>
@@ -54,7 +56,7 @@ Some things just for fun...
 </p>
 
 <p>
-	<a id="button" href="livetext_textboxes.html">⭐️Live text: describe text boxes and move them around!</a>
+	<a id="button" href="livetext_textboxes.html">💡 Live text: describe text boxes and move them around!</a>
 </p>
 
   <p style="font-size:20;">
@@ -72,5 +74,24 @@ Some things just for fun...
 
 	<p style="font-size:14;color:#00CBDE">Florian Marquardt 2020</p>
 	
+	<script>
+		function circle(x, y, r,color, canvas_id) {
+			var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
+			shape.setAttribute ('cx', x)
+			shape.setAttribute ('cy', y)
+			shape.setAttribute ('r', r)
+			shape.setAttribute('fill',color)
+			shape.setAttribute('fill-opacity',0.7)
+			document.getElementById(canvas_id).appendChild(shape)
+			return(shape)
+		}
+
+		num_circles=100
+		HEIGHT=200
+		MAXRADIUS=100
+		for(j=0;j<num_circles;j++) {
+			circle(document.documentElement.clientWidth*Math.random(),HEIGHT*Math.random(),MAXRADIUS*Math.random(),"rgba("+255*Math.random()+","+255*Math.random()+","+255*Math.random()+",0.5)","canvas")
+		}
+	</script>
 </body>
 </html>
