@@ -16,8 +16,6 @@ You can add more like that, also with other valid html colors, like (20|80|#FFBB
 
 Now the real fun starts: Drag the circles around and see how the coordinates update in the text!
 
-Note: there is still a slight bug...the pointers to the text description blocks should change when other texts are updated (since that changes the length of everything). But they are not. Watch whether you can see the effect in the text.
-
 Code by Florian Marquardt, 2020.
 </textarea>
         </div>
@@ -55,6 +53,7 @@ Code by Florian Marquardt, 2020.
                                 obj.text_start=matches.index
                                 obj.text_end=matches.index+matches[0].length
                                 obj.color_str=str
+                                obj.index_in_array=objects.length
                                 objects.push(obj) // new object
                             }
                             go_on=true
@@ -73,7 +72,15 @@ Code by Florian Marquardt, 2020.
                 new_obj_text="("+Math.round(obj.getAttribute('cx'))+"|"+Math.round(obj.getAttribute('cy'))+"|"+obj.color_str+")"
                 txt=replace_string(txt,obj.text_start,obj.text_end,new_obj_text)
                 txt_field.value=txt
+                old_text_end=obj.text_end
+                // update end point of text reference:
                 obj.text_end=obj.text_start+new_obj_text.length
+                delta=obj.text_end-old_text_end
+                // also correct all subsequent text references:
+                for(j=obj.index_in_array+1;j<objects.length;j++) {
+                    objects[j].text_start+=delta
+                    objects[j].text_end+=delta
+                }
             }
 
             function circle (x, y, r,color) {
