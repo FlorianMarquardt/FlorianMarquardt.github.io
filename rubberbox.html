@@ -11,18 +11,20 @@
     <script>
         function rubberbox(x,y,string,rectcolor,textcolor,textstyle) {
             canvas=document.getElementById("canvas")
+            var group=document.createElementNS ('http://www.w3.org/2000/svg', 'g')
             var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
             rect.setAttribute("fill",rectcolor)
             rect.setAttribute("rx",5)
             rect.setAttribute("ry",5)
-            canvas.appendChild(rect)
+            group.appendChild(rect)
             var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
             text.setAttribute("x",x)
             text.setAttribute("y",y)
             text.setAttribute("fill",textcolor)
             text.setAttribute("style",textstyle)
             text.textContent=string
-            canvas.appendChild(text)
+            group.appendChild(text)
+            canvas.appendChild(group)
             bbox=text.getBBox()
             rect.setAttribute("width",bbox.width+0.5*bbox.height)
             rect.setAttribute("height",bbox.height)
