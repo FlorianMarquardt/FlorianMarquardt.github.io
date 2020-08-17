@@ -1,0 +1,38 @@
+<html>
+    <title>
+        Rubber box: stretching to fit text
+    </title>
+    <!--- 2020 by Florian Marquardt; re-use under MIT license -->
+    <body style="margin:0px;background-color:steelblue">
+        <svg id="canvas" viewBox="0 0 200 200">
+        </svg>
+    </body>
+
+    <script>
+        function rubberbox(x,y,string,rectcolor,textcolor,textstyle) {
+            canvas=document.getElementById("canvas")
+            var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
+            rect.setAttribute("fill",rectcolor)
+            rect.setAttribute("rx",5)
+            rect.setAttribute("ry",5)
+            canvas.appendChild(rect)
+            var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+            text.setAttribute("x",x)
+            text.setAttribute("y",y)
+            text.setAttribute("fill",textcolor)
+            text.setAttribute("style",textstyle)
+            text.textContent=string
+            canvas.appendChild(text)
+            bbox=text.getBBox()
+            rect.setAttribute("width",bbox.width+0.5*bbox.height)
+            rect.setAttribute("height",bbox.height)
+            rect.setAttribute("x",x-0.25*bbox.height)
+            rect.setAttribute("y",y-0.8*bbox.height)
+        }
+
+        rubberbox(30,50,"A test (nice)","orange","white","font-family:\"Arial Black\";font-size:14")
+        rubberbox(20,20,"Electron","khaki","black","font-family:Georgia;font-size:12")
+        rubberbox(25,90,"Zero Point","tomato","white","font-family:Courier;font-size:24")
+</script>
+</html>
+
