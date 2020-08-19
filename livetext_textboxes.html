@@ -197,12 +197,18 @@ Code by Florian Marquardt, 2020.
                     }
                 }
             }
+
+            function touchMove(evt) {
+                evt.buttons=1 // to fool the mouseMove function
+                mouseMove(evt)
+            }
             // init:
             objects=new Array()
             text_changed() // parse text for a first time, to show objects
             current_object=null
 
             document.getElementById("canvas").addEventListener("mousemove",mouseMove)
+            document.getElementById("canvas").addEventListener("touchmove",touchMove)
         </script>
     </body>
 </html>
