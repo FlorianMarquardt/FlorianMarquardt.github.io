@@ -1,0 +1,136 @@
+<html >
+    <title>
+        Javascript/SVG Live: Experiment with SVG Vector Graphics
+    </title>
+    <head>
+        <meta charset="utf-8"/> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+    svg text{
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    }
+        </style>
+    </head>
+    <!-- (C) 2020 by Florian Marquardt; MIT License -->
+    <body style="margin:0px">
+        <div style="float:left;width:50%;background-color:black">
+            <svg id="canvas" viewBox="0 0 100 100" style="width:100%;height:100%">
+            </svg>
+        </div>
+        <div style="float:left;width:50%;">
+            <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:18;background-color:darkseagreen;color:white" oninput="text_changed()">
+// Enter javascript code here to draw:
+
+var N=200;
+var j,r,g,b,x,y
+var WIDTH=100
+var HEIGHT=100
+
+for(j=1;j<=N;j++) {
+  r=Math.random()*255;
+  g=Math.random()*255;
+  b=Math.random()*255;
+  x=Math.random()*WIDTH
+  y=Math.random()*HEIGHT
+  circle(x,y,10, "rgba("+r+","+g+","+b+",0.5)");
+}
+
+
+/*
+
+Note: Code is executed live while you type... as long as the code is invalid, some or all of the graphics may disappear.
+Note: You have to declare variables before use, like "var A,B" or "var C=5;" 
+
+⛔️ Warning: Do not execute code provided by someone else unless you understand that it doesn't do anything malicious. This directly executes javascript, without any safety precautions.
+
+Pre-defined:
+
+canvas 
+...reference to the SVG drawing area (to which all other functions draw)
+
+circle(x,y,radius,color)
+...draw a circle. Returns the circle svg object for reference (same is true for all the other graphics functions below).
+
+add(graphics_type,...attributes...)
+...add an svg object of 'graphics_type', with a list of attributes. Example: add("circle","cx",10,"cy",20,"r","10")
+
+rubberbox(x,y,string,rectcolor,textcolor,textstyle)
+...draw a rounded box with text inside, stretching to fit (returns group object).
+
+Code 2020 by Florian Marquardt
+*/
+
+</textarea>
+        </div>
+
+        <script>
+            
+            function text_changed() { // parse text area to draw objects!
+                txt_field=document.getElementById ('inputarea')
+                txt=txt_field.value
+                while (canvas.firstChild) { // delete old objects
+                    canvas.removeChild(canvas.firstChild);
+                }
+                try {
+                    Function("self","window","document","'use strict';"+txt)(null,null,null)
+                } catch(e) {
+                    console.log(e)
+                }
+            }
+
+            function setAttributes(elem,attributes) {
+                for (var i = 1; i < attributes.length; i+=2) {
+                    elem.setAttribute(attributes[i],attributes[i+1]);
+                }
+            }
+
+            function add() {
+                args=Array.from(arguments)
+                var shape = document.createElementNS("http://www.w3.org/2000/svg", args[0]);
+                setAttributes(shape,args);
+                canvas.appendChild(shape);
+                return shape;
+            }
+
+            function circle(x, y, r,color) {
+                var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
+                shape.setAttribute ('cx', x)
+                shape.setAttribute ('cy', y)
+                shape.setAttribute ('r', r)
+                shape.setAttribute('fill',color)
+                canvas.appendChild(shape)
+                return(shape)
+            }
+
+            function rubberbox(x,y,string,rectcolor,textcolor,textstyle) {
+                var group=document.createElementNS ('http://www.w3.org/2000/svg', 'g')
+                var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
+                rect.setAttribute("fill",rectcolor)
+                rect.setAttribute("rx",5)
+                rect.setAttribute("ry",5)
+                group.appendChild(rect)
+                var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+                text.setAttribute("x",x)
+                text.setAttribute("y",y)
+                text.setAttribute("fill",textcolor)
+                text.setAttribute("style",textstyle)
+                text.setAttribute("pointer-events","none")
+                text.textContent=string
+                group.appendChild(text)
+                canvas.appendChild(group)
+                bbox=text.getBBox()
+                rect.setAttribute("width",bbox.width+0.5*bbox.height)
+                rect.setAttribute("height",bbox.height)
+                rect.setAttribute("x",x-0.25*bbox.height)
+                rect.setAttribute("y",y-0.8*bbox.height)
+                return(group)
+            }
+
+            canvas=document.getElementById("canvas")
+            text_changed() // execute for the first time
+        </script>
+    </body>
+</html>
