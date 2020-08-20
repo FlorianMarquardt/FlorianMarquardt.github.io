@@ -1,0 +1,240 @@
+<html >
+    <title>
+        Javascript/SVG Live: Experiment with SVG Vector Graphics
+    </title>
+    <head>
+        <meta charset="utf-8"/> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <!-- (C) 2020 by Florian Marquardt; MIT License -->
+    <body style="margin:0px">
+        <div style="float:left;width:50%;background-color:black">
+            <svg id="canvas" viewBox="0 0 100 100" style="width:100%;height:100%">
+            </svg>
+        </div>
+        <div style="float:left;width:50%;height:calc(100% - 100px);">
+            <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:18;background-color:darkseagreen;color:white" oninput="text_changed()">
+// Enter javascript code here to draw:
+
+var N=200
+var j,r,g,b,x,y
+var WIDTH=100
+var HEIGHT=100
+
+for(j=1;j<=N;j++) {
+  r=Math.random()*255
+  g=Math.random()*255
+  b=Math.random()*255
+  x=Math.random()*WIDTH
+  y=Math.random()*HEIGHT
+  circle(x,y,10, "rgba("+r+","+g+","+b+",0.5)")
+}
+
+// NAME:📋Scratch
+
+/*
+
+Note: Code is executed live while you type... as long as the code is invalid, some or all of the graphics may disappear.
+Note: You have to declare variables before use, like "var A,B" or "var C=5;" 
+
+⛔️ Warning: Do not execute code provided by someone else unless you understand that it doesn't do anything malicious. This directly executes javascript, without any safety precautions.
+
+Pre-defined:
+
+canvas 
+...reference to the SVG drawing area (to which all other functions draw)
+
+circle(x,y,radius,color)
+...draw a circle. Returns the circle svg object for reference (same is true for all the other graphics functions below).
+
+add(graphics_type,...attributes...)
+...add an svg object of 'graphics_type', with a list of attributes. Example: add("circle","cx",10,"cy",20,"r","10")
+
+rubberbox(x,y,string,rectcolor,textcolor,textstyle)
+...draw a rounded box with text inside, stretching to fit (returns group object).
+
+Code 2020 by Florian Marquardt
+*/
+
+</textarea>
+<div style="overflow-x:scroll;height=90px;background-color:black">
+    <svg id="script_selection" width=900 height=90>
+    </svg>
+</div>
+</div>
+        <script>
+            
+            function text_changed() { // parse text area to draw objects!
+                txt_field=document.getElementById ('inputarea')
+                txt=txt_field.value
+                while (canvas.firstChild) { // delete old objects
+                    canvas.removeChild(canvas.firstChild);
+                }
+                try {
+                    Function("self","window","document","script_selection","'use strict';"+txt)(null,null,null,null)
+                } catch(e) {
+                    console.log(e)
+                }
+
+                scripts[current_script_index]=txt
+
+                var patt = /NAME:(.*)/g
+                matches=patt.exec(txt)
+                if(matches) {
+                    str=matches[1]
+                    change_script_icon(current_script_index,str.slice(0,2),str.slice(2,))
+                }
+            }
+
+            function setAttributes(elem,attributes) {
+                for (var i = 1; i < attributes.length; i+=2) {
+                    elem.setAttribute(attributes[i],attributes[i+1]);
+                }
+            }
+
+            function add() {
+                args=Array.from(arguments)
+                var shape = document.createElementNS("http://www.w3.org/2000/svg", args[0]);
+                setAttributes(shape,args);
+                canvas.appendChild(shape);
+                return shape;
+            }
+
+            function circle(x, y, r,color) {
+                var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
+                shape.setAttribute ('cx', x)
+                shape.setAttribute ('cy', y)
+                shape.setAttribute ('r', r)
+                shape.setAttribute('fill',color)
+                canvas.appendChild(shape)
+                return(shape)
+            }
+
+            function rect(x,y,width,height,color,corner_radius=0) {
+                var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
+                rect.setAttribute("x",x)
+                rect.setAttribute("y",y)
+                rect.setAttribute("width",width)
+                rect.setAttribute("height",height)
+                rect.setAttribute("fill",color)
+                rect.setAttribute("rx",corner_radius)
+                canvas.appendChild(rect)
+            }
+
+            function text(x,y,textstring,color,textstyle="") {
+                var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+                text.setAttribute("x",x)
+                text.setAttribute("y",y)
+                text.setAttribute("fill",color)
+                text.setAttribute("style",textstyle)
+                text.textContent=textstring
+                canvas.appendChild(text)                
+            }
+
+            function rubberbox(x,y,string,rectcolor,textcolor,textstyle) {
+                var group=document.createElementNS ('http://www.w3.org/2000/svg', 'g')
+                var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
+                rect.setAttribute("fill",rectcolor)
+                rect.setAttribute("rx",5)
+                rect.setAttribute("ry",5)
+                group.appendChild(rect)
+                var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+                text.setAttribute("x",x)
+                text.setAttribute("y",y)
+                text.setAttribute("fill",textcolor)
+                text.setAttribute("style",textstyle)
+                text.setAttribute("pointer-events","none")
+                text.textContent=string
+                group.appendChild(text)
+                canvas.appendChild(group)
+                bbox=text.getBBox()
+                rect.setAttribute("width",bbox.width+0.5*bbox.height)
+                rect.setAttribute("height",bbox.height)
+                rect.setAttribute("x",x-0.25*bbox.height)
+                rect.setAttribute("y",y-0.8*bbox.height)
+                return(group)
+            }
+
+            script_selection_width=80
+            script_selection_x=5
+
+            function add_script_icon(icon,string,color) {
+                var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')                
+                rect.setAttribute("x",script_selection_x)
+                rect.setAttribute("y",5)
+                rect.setAttribute("width",script_selection_width)
+                rect.setAttribute("height",script_selection_width)
+                rect.setAttribute("fill",color)
+                rect.setAttribute("rx","10px")
+                script_selection.appendChild(rect)
+                var text1 = document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+                text1.setAttribute("x",5+script_selection_x)
+                text1.setAttribute("y",5+script_selection_width*0.8)
+                text1.setAttribute("style","pointer-events:none; font-size:"+0.8*script_selection_width)
+                text1.textContent=icon
+                script_selection.appendChild(text1)
+                var text2 = document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+                text2.setAttribute("x",script_selection_x+10)
+                text2.setAttribute("y",5+script_selection_width-10)
+                text2.setAttribute("style","pointer-events:none; fill:white;font-size:24px;text-shadow: 0px 0px 2px black;")
+                text2.textContent=string
+                script_selection.appendChild(text2)        
+                script_selection_x+=(script_selection_width+5)
+                rect.addEventListener("click",select_script)
+                rect.script_index=script_icon_objects.length
+                script_icon_objects.push([rect,text1,text2]) // save for later
+            }
+
+            function select_script(event) {
+                index=event.target.script_index
+                if(index>0) { // 0 is special ('Add')
+                    change_current_script_index(event.target.script_index)
+                } else { // Add another icon!
+                    var obj=script_icon_objects[current_script_index]
+                    scripts[script_icon_objects.length]=txt_field.value
+                    add_script_icon(obj[1].textContent,obj[2].textContent,"orange")
+                    change_current_script_index(script_icon_objects.length-1)
+                }
+            }
+
+            // change icon and name of a script
+            function change_script_icon(index,icon,string) {
+                script_icon_objects[index][1].textContent=icon
+                script_icon_objects[index][2].textContent=string
+            }
+
+            // switch to another script and highlight it
+            function change_current_script_index(new_index) {
+                script_icon_objects[current_script_index][0].setAttribute("stroke-width",0)
+                script_icon_objects[new_index][0].setAttribute("stroke-width","3")
+                script_icon_objects[new_index][0].setAttribute("stroke","white")                
+                current_script_index=new_index
+                txt_field.value=scripts[new_index]
+                text_changed()
+            }
+
+            script_selection=document.getElementById("script_selection")
+
+            script_names=["📥Add","📋Scratch","🥑Simple","🔤Hello"]
+            script_icon_objects=[]
+            for(var j=0;j<script_names.length;j++) {
+                if(j==0) { color="maroon" } else { color="orange" }
+                add_script_icon(script_names[j].slice(0,2),script_names[j].slice(2),color)
+            }
+
+            scripts=["","",
+"circle(50,50,20,\"orange\")\n\n// NAME:🥑Simple\n",
+"rect(0,0,100,30,\"cadetblue\")\ntext(3,20,\"Hello World!\",\"white\",\"font-size:18; text-shadow: 1px 1px 2px black\")\n\n// NAME:🔤Hello"
+]
+
+            current_script_index=1
+
+            change_current_script_index
+            canvas=document.getElementById("canvas")
+            
+            text_changed() // execute for the first time
+
+            change_current_script_index(1)
+        </script>
+    </body>
+</html>
