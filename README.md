@@ -1,5 +1,7 @@
 # FlorianMarquardt.github.io
 
+Website: http://FlorianMarquardt.github.io
+
 Random things that might be fun, and which work nicely on a website (experimenting with javascript/svg/css/html). 
 
 **Check out manybody_gravity.html** (a simulation of a star cluster, in 226 lines of html, including user interface)
