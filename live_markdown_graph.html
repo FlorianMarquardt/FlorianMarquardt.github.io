@@ -1,0 +1,334 @@
+<html >
+    <title>
+        Live markdown graph: describing a graph in markdown, dragging nodes around
+    </title>
+    <head>
+        <meta charset="utf-8"/> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+    svg text{
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    }
+        </style>
+    </head>
+    <!-- (C) 2020 by Florian Marquardt; MIT License -->
+    <body style="margin:0px">
+        <div style="float:left;width:50%;background-color:wheat">
+            <svg id="canvas" viewBox="0 0 100 100" style="width:100%;height:100%">
+            </svg>
+        </div>
+        <div style="float:left;width:50%;">
+            <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:18;background-color:darkseagreen;color:white" oninput="text_changed()">
+# The neutron
+[pos|50|50|orange]
+
+The neutron always stays strictly neutral.
+
+# The electron
+[pos|30|20|rebeccapurple]
+
+The electron can be a bit negative at times, but it is basically everywhere, and immensely important.
+
+# The proton
+[pos|10|10|tomato]
+
+The proton: always positive, and usually surrounded by electrons.
+</textarea>
+        </div>
+
+        <script>
+            
+            function text_changed() { // parse text area to draw objects!
+                txt_field=document.getElementById ('inputarea')
+                txt=txt_field.value
+                lines=txt.split(/\r?\n/)
+
+                if(objects.length>0) { // delete old objects from svg canvas
+                    for(var j=0;j<objects.length;j++) {
+                        objects[j].remove()
+                    }
+                }
+                objects=new Array() // empty array of objects
+
+               
+                // regexp pattern for the headers: # ...
+                var header_pattern = /# (.*)/g
+                 // regexp pattern for the [pos|x|y|color] formatting string:
+                var pos_pattern = /\[pos\|([^|]+)\|([^|]+)\|(.*?)\]/g
+                var textpos=0
+                var block_start=0
+                var textstr=""
+
+                for(var j=0;j<lines.length;j++) {
+                    var line=lines[j]
+                    var matches=header_pattern.exec(line)
+                    if(matches || j==lines.length-1) { // got a header or EOF
+                        if(matches) { 
+                            textstr=matches[1] // header title
+                            block_end=j-1
+                        } else {
+                            block_end=j
+                        }
+                        // process previous text block between headers
+                        if(block_end>=block_start) {
+                            var block_string=lines[block_start]
+                            for(var k=block_start+1;k<=block_end;k++) {
+                                block_string+="\n"+lines[k]
+                            }
+                        } else {
+                            block_string=""
+                        }
+
+                        // eliminate all extra markdown
+                        block_string=block_string.replace(pos_pattern,'')
+
+                        // attach block_string to the previous processed header
+                        if(obj) {
+                            obj.block_string=block_string
+                            obj=null
+                        }
+
+                        // for next block:
+                        var block_start=j+1
+                    } else {
+                        // go through all matches and create objects
+                        do {
+                            var matches=pos_pattern.exec(line)
+                            var go_on=false
+                            if(matches) {
+                                if(matches.length>=4) {
+                                    var x=parseFloat(matches[1])
+                                    var y=parseFloat(matches[2])
+                                    var colorstr=matches[3]
+                                    if(!isNaN(x) && !isNaN(y)) {
+                                        var obj=rubberbox(x,y,textstr,colorstr,"white","font-family:\"Arial Black\";font-size:12")
+                                        // attach event listeners to the rectangle (not the group, which does not work)
+                                        var the_rect=obj.childNodes[0]
+                                        var the_text=obj.childNodes[1]
+
+                                        the_rect.addEventListener("mouseenter",mouseEnter)
+                                        the_rect.addEventListener("mouseleave",mouseLeave)
+                                        
+                                        the_rect.official_object=obj // save reference back to the overall group
+                                        obj.rect=the_rect
+                                        obj.text_object=the_text
+                                        // Save reference to where in the text
+                                        // the info is located! Need this to
+                                        // update it upon drag...
+                                        // (we are just adding new properties here
+                                        // to the svg graphics object...not polite,
+                                        // but it works for this simple example!)
+                                        obj.text_start=textpos+matches.index
+                                        obj.text_end=textpos+matches.index+matches[0].length
+                                        obj.color_str=colorstr
+                                        obj.text_str=textstr
+                                        // the official coordinates:
+                                        obj.official_x=x
+                                        obj.official_y=y
+                                        // the possible extra shift (will come later during dragging)
+                                        obj.official_translate_x=0.0
+                                        obj.official_translate_y=0.0
+                                        obj.index_in_array=objects.length
+                                        obj.block_is_on_display=false
+                                        objects.push(obj) // new object
+                                    }
+                                    go_on=true
+                                }
+                            }
+                        } while(go_on)
+
+                    }
+                    textpos+=(line.length+1)
+                }
+
+
+            }
+
+            function replace_string(old_string,start,stop,new_insertion) {
+                return(old_string.slice(0,start)+new_insertion+old_string.slice(stop))
+            }
+
+            // update the text description of an object inside the text area
+            function update_obj_text(obj) {
+                // convert the revised properties of the object into text:
+                new_obj_text="[pos|"+Math.round(obj.official_x)+"|"+Math.round(obj.official_y)+"|"+obj.color_str+"]"
+                // update the text area:
+                txt=replace_string(txt,obj.text_start,obj.text_end,new_obj_text)
+                txt_field.value=txt
+                // update end point of text reference:
+                old_text_end=obj.text_end
+                obj.text_end=obj.text_start+new_obj_text.length
+                delta=obj.text_end-old_text_end
+                // also correct all subsequent text references:
+                for(j=obj.index_in_array+1;j<objects.length;j++) {
+                    objects[j].text_start+=delta
+                    objects[j].text_end+=delta
+                }
+            }
+
+            function rubberbox(x,y,string,rectcolor,textcolor,textstyle) {
+                canvas=document.getElementById("canvas")
+                var group=document.createElementNS ('http://www.w3.org/2000/svg', 'g')
+                var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
+                rect.setAttribute("fill",rectcolor)
+                rect.setAttribute("rx",5)
+                rect.setAttribute("ry",5)
+                group.appendChild(rect)
+                var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+                text.setAttribute("x",x)
+                text.setAttribute("y",y)
+                text.setAttribute("fill",textcolor)
+                text.setAttribute("style",textstyle)
+                text.setAttribute("pointer-events","none")
+                text.textContent=string
+                group.appendChild(text)
+                canvas.appendChild(group)
+                bbox=text.getBBox()
+                rect.setAttribute("width",bbox.width+0.5*bbox.height)
+                rect.setAttribute("height",bbox.height)
+                rect.setAttribute("x",x-0.25*bbox.height)
+                rect.setAttribute("y",y-0.8*bbox.height)
+                return(group)
+            }
+
+            function rect(x,y,width,height,color,corner_radius=0) {
+                var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
+                rect.setAttribute("x",x)
+                rect.setAttribute("y",y)
+                rect.setAttribute("width",width)
+                rect.setAttribute("height",height)
+                rect.setAttribute("fill",color)
+                rect.setAttribute("rx",corner_radius)
+                canvas.appendChild(rect)
+                return(rect)
+            }
+
+            function HTMLObject(x,y,width,height,htmlcode) {
+                var fo= document.createElementNS ('http://www.w3.org/2000/svg', 'foreignObject')
+                fo.setAttribute("x",x)
+                fo.setAttribute("y",y)
+                fo.setAttribute("width",width)
+                fo.setAttribute("height",height)         
+                var newDiv = document.createElement('div')
+                newDiv.style="padding:5px;background-color:rgba(0,0,0,0.6);font-size:8;font-family:Helvetica;color:white"
+                newDiv.innerHTML=htmlcode
+                fo.appendChild(newDiv)
+                canvas.appendChild(fo)
+                return(fo)
+            }
+
+            // mouse entered an object
+            function mouseEnter(evt) {
+                if(current_object) { // we are already dragging something!
+                    return
+                }
+                evt.target.setAttribute("stroke","white")
+                evt.target.setAttribute("stroke-width",1)
+                current_object=evt.target.official_object
+                oldpos=null
+
+                // display text block
+                obj=evt.target.official_object
+                if(obj && !obj.block_is_on_display) {
+                    if(obj.block_string) {
+                        var x=obj.official_x
+                        var y=obj.official_y
+                        var h=obj.rect.getAttribute("height")
+                        obj.block_display_box=HTMLObject(x,y+5,200,200,obj.block_string)
+                    }
+                    obj.block_is_on_display=true                    
+                }
+            }
+
+            // mouse left
+            function mouseLeave(evt) {
+                if(evt.buttons>0) { // we are already dragging
+                    return
+                }
+                
+                if(current_object && !(evt.relatedTarget==current_object.text_object)) {
+                    evt.target.setAttribute("stroke",null)
+                    if(current_object.block_is_on_display) {
+                        current_object.block_display_box.remove()
+                        current_object.block_is_on_display=false
+                    }
+                    current_object=null
+                }
+            }
+
+            // mouse is moving (means: dragging, if button is down)
+            function mouseMove(evt) {
+                if(evt.buttons>0) {
+                    if(current_object) {
+                        if(current_object.block_is_on_display) {
+                            current_object.block_display_box.remove()
+                            current_object.block_is_on_display=false
+                        }
+                        evt.preventDefault()
+                        // the most complex thing: properly
+                        // transforming from screen coordinates to
+                        // object coordinates:
+                        canvas=document.getElementById('canvas')
+                        var pos = canvas.createSVGPoint()
+                        pos.x = evt.pageX
+                        pos.y = evt.pageY
+                        var ctm = canvas.getScreenCTM()
+                        if (ctm = ctm.inverse()) {
+                            pos=pos.matrixTransform(ctm)
+                        }
+                        if(oldpos) {
+                            delta_x=pos.x-oldpos.x
+                            delta_y=pos.y-oldpos.y
+                            //console.log(delta_x,delta_y)
+                            current_object.official_x+=delta_x // move it!
+                            current_object.official_y+=delta_y
+                            current_object.official_translate_x+=delta_x
+                            current_object.official_translate_y+=delta_y                            
+                            // setting the new transform for the svg group object
+                            current_object.setAttribute("transform",
+                            "translate("+current_object.official_translate_x+","+current_object.official_translate_y+")");
+                            update_obj_text(current_object) // update text area!
+                        }
+                        oldpos=pos
+                    }
+                } 
+            }
+
+            function mouseWheel(e) {
+                if(e.deltaY>0) {
+                    var factor=1.02
+                } else {
+                    var factor=1/1.02
+                }
+                var vb_string=canvas.getAttribute("viewBox")
+                var viewbox=vb_string.split(" ")
+                var x=parseFloat(viewbox[0])
+                var y=parseFloat(viewbox[1])
+                var w=parseFloat(viewbox[2])
+                var h=parseFloat(viewbox[3])
+                x-=0.5*w*(factor-1)
+                y-=0.5*h*(factor-1)
+                w*=factor
+                h*=factor                
+                canvas.setAttribute("viewBox",x+" "+y+" "+w+" "+h)
+                e.preventDefault() // stop whole page from scrolling
+            }
+
+            function touchMove(evt) {
+                evt.buttons=1 // to fool the mouseMove function
+                mouseMove(evt)
+            }
+            // init:
+            objects=new Array()
+            text_changed() // parse text for a first time, to show objects
+            current_object=null
+
+            document.getElementById("canvas").addEventListener("mousemove",mouseMove)
+            document.getElementById("canvas").addEventListener("touchmove",touchMove)
+            document.getElementById("canvas").addEventListener("mousewheel",mouseWheel)
+        </script>
+    </body>
+</html>
