@@ -26,7 +26,6 @@
 <body style="margin:0; background-color:#000000">
 
 <!-- 
-First: the panel on the left, onto which the animation will be drawn.
 Scripts are at the end of this page!
 --->
 
@@ -35,7 +34,7 @@ Scripts are at the end of this page!
 </div>
 
 <script>
-// from HYG database
+// from HYG database, available on github (here: extracted only nearby stars)
 star_data=[ // NAME,DISTANCE,ABSOLUTE_MAGNITUDE,X,Y,Z,VX,VY,VZ (lengths in light years)
 [" Sol ", 0.0 , 4.850 , 1.631e-05 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 ],
 ["  ", 14.1567538 , 10.373 , 11.250129128 , 0.265474608 , -8.590503095999999 , -4.560276e-05 , 0.00038569888 , -0.00017389722000000002 ],
@@ -161,7 +160,6 @@ function circle(x, y, r,color, canvas_id) {
 	shape.setAttribute ('cy', y)
 	shape.setAttribute ('r', r)
 	shape.setAttribute('fill',color)
-//	shape.setAttribute('fill-opacity',0.7)
 	document.getElementById(canvas_id).appendChild(shape)
 	return(shape)
 }
@@ -197,7 +195,7 @@ CY=50
 
 
 function show_all() {
-    num_objects=canvas.children.length
+    num_objects=canvas.children.length // delete old objects
     for(var j=0;j<num_objects;j++) {
         canvas.children[0].remove()
     }
@@ -207,37 +205,25 @@ function show_all() {
 
     angle+=0.01
 
-	// make new stars
-	XSCALE=30
-	VSCALE=1.0
-    rSCALE=3.0
-    
-
 	X=new Array(num_stars)
 	Y=new Array(num_stars)
 	Z=new Array(num_stars)
-	VX=new Array(num_stars)
-	VY=new Array(num_stars)
-	VZ=new Array(num_stars)
-	r=new Array(num_stars)
-	star=Array(num_stars)
 
     SHORTENING=0.3
 
     var grad
     grad=add("radialGradient","fx",0.5,"fy",0.5)
 
-    grad.innerHTML="<stop offset='70%' stop-color='gold' /> <stop offset='90%' stop-color='red' /> <stop offset='100%' stop-color='maroon' />"
+    grad.innerHTML="<stop offset='60%' stop-color='gold' /> <stop offset='80%' stop-color='red' /> <stop offset='100%' stop-color='maroon' />"
     grad.setAttribute("id","mygrad")
 
     star_points=[]
 	for(j=0;j<num_stars;j++) {
         var X0=star_data[j][3]
         var Y0=star_data[j][4]
-        X[j]=X0*c+Y0*s
+        X[j]=X0*c+Y0*s // rotated about z axis
         Y[j]=Y0*c-X0*s
         Z[j]=star_data[j][5]
-        r[j]=1
 
 //        distance=Math.sqrt(X[j]*X[j]+Y[j]*Y[j]+Z[j]*Z[j])
         var x=CX+X[j]+SHORTENING*Z[j]
@@ -249,7 +235,7 @@ function show_all() {
         star_points.push([x,y,xprime,yprime,z,star_data[j][0]])
     }
 
-    star_points.sort((a,b) => (b[4]-a[4])) // sort drawing order
+    star_points.sort((a,b) => (b[4]-a[4])) // sort drawing order according to z
 
     for(j=0;j<num_stars;j++) {
         x=star_points[j][0]
@@ -264,40 +250,11 @@ function show_all() {
 
 }
 
-old_num_stars=0
 num_stars=star_data.length
 
 angle=0.0
 
 setInterval(show_all,50)
-
-
-function mouseWheel(e) {
-	if(e.deltaY>0) {
-		factor=1.01
-	} else {
-		factor=1/1.01
-	}
-	plot_scale*=factor
-	CX-=50; CY-=50;
-	CX*=factor; CY*=factor;
-	CX+=50; CY+=50;
-	for(j=0;j<num_stars;j++) {
-		r[j]*=factor
-		star[j].setAttribute('r',r[j])
-	}
-	e.preventDefault() // stop whole page from scrolling
-}
-
-function mouseMove(e) {
-	if(e.buttons>0) {
-		CX+=0.2*e.movementX
-		CY+=0.2*e.movementY
-	}
-}
-
-document.getElementById('canvas').addEventListener('wheel', mouseWheel)
-document.getElementById('canvas').addEventListener('mousemove', mouseMove)
 
 </script>
 
