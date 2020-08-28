@@ -900,7 +900,7 @@ math_ctx.def('sin',function(a) {return(nsin(a))})
 math_ctx.def('cos',function(a) {return(ncos(a))})
 math_ctx.def('sqrt',function(a) {return(nsqrt(a))})
 
-red=Shunt.parse("sin(9*sqrt(x*x+y*y))^2",math_ctx)
+red=Shunt.parse("sin(9*(sin(3*x)+sqrt(x*x+y*y)))^2",math_ctx)
 green=Shunt.parse("cos(10*sqrt(x*x+y*y))^2",math_ctx)
 blue=Shunt.parse("x",math_ctx)
 
