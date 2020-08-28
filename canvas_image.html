@@ -1,0 +1,118 @@
+<html>
+<title>Nearby stars</title>
+	<head>
+				<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	
+<body style="margin:0; background-color:#000000">
+
+<!-- 
+First: the panel on the left, onto which the animation will be drawn.
+Scripts are at the end of this page!
+--->
+
+<div style="width:100%">
+	<canvas id="canvas" width="512" height="512">	</canvas>
+</div>
+
+<script>
+
+function init_img_canvas(width,height) { // prepare x,y,red,green,blue and img
+    var j,k
+
+    WIDTH=width
+    HEIGHT=height
+    N=WIDTH*HEIGHT
+
+    x=new Array(N)
+    y=new Array(N)
+    for(j=0;j<HEIGHT;j++) {
+        for(k=0;k<WIDTH;k++) {
+            x[k+j*WIDTH]=k/WIDTH
+            y[k+j*WIDTH]=j/HEIGHT
+        }
+    }
+
+    canvas=document.getElementById('canvas')
+    ctx=canvas.getContext('2d')
+    img=ctx.createImageData(WIDTH,HEIGHT)
+}
+
+
+
+function draw_img() { // draw the img contained inside red,green,blue
+    var j,k
+
+    for(j=0;j<N;j++) {
+        k=4*j
+        img.data[k]=255*red[j]
+        img.data[k+1]=255*green[j]
+        img.data[k+2]=255*blue[j]
+        img.data[k+3]=255
+    }
+    ctx.putImageData(img,0,0)
+}
+
+function nsqr(A) {
+    var j
+
+    var B=new Array(N)
+    for(j=0;j<N;j++) {
+        B[j]=A[j]*A[j]
+    }
+    return(B)
+}
+
+function nsqrt(A) {
+    var j
+
+    var B=new Array(N)
+    for(j=0;j<N;j++) {
+        B[j]=Math.sqrt(A[j])
+    }
+    return(B)
+}
+
+function nadd(A,B) {
+    var j
+
+    var C=new Array(N)
+    for(j=0;j<N;j++) {
+        C[j]=A[j]+B[j]
+    }
+    return(C)
+}
+
+function nsin(A) {
+    var j
+
+    var B=new Array(N)
+    for(j=0;j<N;j++) {
+        B[j]=Math.sin(A[j])
+    }
+    return(B)
+}
+
+function nfactormul(c,A) {
+    var j
+
+    var B=new Array(N)
+    for(j=0;j<N;j++) {
+        B[j]=c*A[j]
+    }
+    return(B)
+}
+
+init_img_canvas(500,500)
+
+red=nsqr(nsin(nfactormul(9,nsqrt(nadd(nsqr(x),nsqr(y)))))) // sin(x**2+y**2)
+green=nfactormul(0.5,y) // 0.5*y
+blue=nfactormul(0.5,x)  // 0.5*x
+
+draw_img()
+
+</script>
+
+
+</body>
+</html>
