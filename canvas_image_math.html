@@ -20,7 +20,8 @@ Scripts are at the end of this page!
 --->
 
 <div style="width:100%;text-align:center" class="vertical-center">
-	<canvas id="canvas" width="512" height="512">	</canvas>
+    <canvas id="canvas" width="512" height="512">	</canvas>
+    <p id="formula_display" style="font-size:12;font-family:Courier;color:white"></p>
 </div>
 
 <script>
@@ -908,12 +909,17 @@ math_ctx.def('sin',function(a) {return(nsin(a))})
 math_ctx.def('cos',function(a) {return(ncos(a))})
 math_ctx.def('sqrt',function(a) {return(nsqrt(a))})
 
-red=Shunt.parse("sin(9*(sin(3*x)+sqrt(x*x+y*y)))^2",math_ctx)
-green=Shunt.parse("cos(10*sqrt(x*x+y*y))^2",math_ctx)
-blue=Shunt.parse("x",math_ctx)
+red_formula="sin(9*(sin(3*x)+sqrt(x*x+y*y)))^2"
+green_formula="cos(10*sqrt(x*x+y*y))^2"
+blue_formula="x"
+
+red=Shunt.parse(red_formula,math_ctx)
+green=Shunt.parse(green_formula,math_ctx)
+blue=Shunt.parse(blue_formula,math_ctx)
 
 draw_img()
 
+document.getElementById('formula_display').innerHTML="red="+red_formula+"<br>green="+green_formula+"<br>blue="+blue_formula
 </script>
 
 
