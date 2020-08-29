@@ -921,8 +921,8 @@ math_ctx.def('sin',function(a) {return(nsin(a))})
 math_ctx.def('cos',function(a) {return(ncos(a))})
 math_ctx.def('sqrt',function(a) {return(nsqrt(a))})
 
-red_formula="sin(9*(sin(3*x)+sqrt(x*x+y*y)))^2"
-green_formula="cos(10*sqrt(x*x+y*y))^2"
+red_formula="sin(9*(sin(3*x)+sqrt(x^2+y^2)))^4"
+green_formula="cos(10*sqrt(x^2+y^2))^2"
 blue_formula="x"
 
 function img_from_expr() {
