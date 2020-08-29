@@ -663,7 +663,7 @@ function init_img_canvas(width,height) { // prepare x,y,red,green,blue and img
     for(j=0;j<HEIGHT;j++) {
         for(k=0;k<WIDTH;k++) {
             x[k+j*WIDTH]=k/WIDTH
-            y[k+j*WIDTH]=j/HEIGHT
+            y[k+j*WIDTH]=(HEIGHT-j-1)/HEIGHT
         }
     }
 
