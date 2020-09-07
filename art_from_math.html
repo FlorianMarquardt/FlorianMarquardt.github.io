@@ -1,0 +1,1206 @@
+<html>
+<title>Art from Math</title>
+	<head>
+				<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<style>
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+.mybutton {
+    color:white;
+    font-family:Helvetica;
+    font-weight:100;
+    background-color:black;
+    border-radius:5px;
+    border-width:0px;
+    font-size:1em' 
+}
+.mybutton:hover {
+    background-color:orange;
+}
+    </style>
+<body style="margin:0; background-color:#000000">
+
+<!-- 
+Code by FM (c) 2020, MIT license;
+containing code by murdoc for the expression parser; also MIT license (see below)
+    --->
+
+<div id="basic_div" style="width:100%;text-align:center" class="vertical-center">
+    <canvas id="canvas" width="512" height="512">	</canvas>
+    <p id="formula_display" style="font-size:0.5em;font-family:Courier;color:gray">Click on lower part of canvas to edit formula. Drag or mouse-wheel to pan and zoom.</p>
+</div>
+
+<script>
+// This parser: see https://github.com/droptable/javascript-shunting-yard
+/*!
+ * JavaScript Shunting-yard
+ * Copyright 2012 - droptable <murdoc@raidrush.org>
+ *
+ * ---------------------------------------------------------------- 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a 
+ * copy of this software and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including without 
+ * limitation the rights to use, copy, modify, merge, publish, distribute, 
+ * sublicense, and/or sell copies of the Software, and to permit persons to 
+ * whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included 
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * <http://opensource.org/licenses/mit-license.php>
+ */
+
+ (function(fn) {
+  if (typeof define === 'function' && define.amd)
+    define('shuntjs', fn);
+  else if (typeof module !== 'undefined')
+    module.exports = fn();
+  else
+    window.Shunt = fn();
+})(function(undefined) { 
+  'use strict';
+  
+  // ----------------------------------------
+  // tokens
+  var T_NUMBER      = 1,  // number
+      T_IDENT       = 2,  // ident (constant)
+      T_FUNCTION    = 4,  // function
+      T_POPEN       = 8,  // (
+      T_PCLOSE      = 16, // )
+      T_COMMA       = 32, // ,
+      T_OPERATOR    = 64, // operator
+      T_PLUS        = 65, // +
+      T_MINUS       = 66, // -
+      T_TIMES       = 67, // * 
+      T_DIV         = 68, // /
+      T_MOD         = 69, // %
+      T_POW         = 70, // ^
+      T_UNARY_PLUS  = 71, // unary +
+      T_UNARY_MINUS = 72, // unary -
+      T_NOT         = 73, // unary ! (convert (n > 0 || n < 0) to 0 and 0 to 1)
+      T_SQRT        = 74; // unary √
+  
+  // ----------------------------------------
+  // token
+  function Token(value, type) {
+    this.value = value;
+    this.type  = type;
+  }
+  
+  Token.prototype = {
+    constructor: Token,
+    
+    // if token is a function:
+    // save argument-count
+    argc: 0
+  };
+  
+  // ----------------------------------------
+  // stack
+  function Stack() {
+    this.index = -1;
+  }
+  
+  Stack.prototype = {
+    constructor: Stack,
+    
+    length: 0,
+    
+    push:    Array.prototype.push,
+    pop:     Array.prototype.pop,
+    shift:   Array.prototype.shift,
+    unshift: Array.prototype.unshift,
+    
+    first: function first() {
+      // this is actualy faster than checking "this.length" everytime.
+      // is looks like common jitter are able to optimize 
+      // array out-of-bounds checks very very well :-)
+      return this[0];
+    },
+    
+    last: function last() {
+      // yada yada yada see comment in .first() :-)
+      return this[this.length - 1];
+    },
+    
+    peek: function peek() {
+      // yada yada yada see comment in .first() :-)
+      return this[this.index + 1];
+    },
+    
+    next: function next() {
+      // yada yada yada see comment in .first() :-)
+      return this[++this.index];
+    },
+    
+    prev: function prev() {
+      // yada yada yada see comment in .first() :-)
+      return this[--this.index];
+    }
+  };
+  
+  // ----------------------------------------
+  // context
+  function Context() {
+    this.fnt = {};               // function-table | use Map?
+    this.cst = { 'π': Math.PI }; // constant-table | use Map?
+  }
+  
+  Context.prototype = {
+    constructor: Context,
+    
+    fn: function fn(name, args) {
+      if (typeof this.fnt[name] !== 'function')
+        throw new Error('runtime error: function "' + name + '" is not defined');
+      
+      var fnc = this.fnt[name];
+      return fnc.apply(fnc, args);
+    },
+    
+    cs: function cs(name) {
+      if (typeof this.cst[name] === 'undefined')
+        throw new Error('runtime error: constant "' + name + '" is not defined');
+      
+      return this.cst[name];
+    },
+    
+    def: function def(name, value) {
+      if (typeof value === 'undefined' && typeof Math[name] === 'function')
+        value = Math[name].bind(Math);
+      
+      if (typeof value === 'function')
+        this.fnt[name] = value;
+      
+      else if (typeof value === 'number' || Array.isArray(value) )
+        this.cst[name] = value;
+      
+      else throw new Error('function or number expected');
+      
+      return this;
+    }
+  };
+  
+  // ----------------------------------------
+  // scanner
+  var RE_PATTERN = /^([√!,\+\-\*\/\^%\(\)]|(?:\d*\.\d+|\d+\.\d*|\d+)(?:[eE][+-]?\d+)?|[a-z_A-Zπ]+[a-z_A-Z0-9]*|[ \t]+)/;
+      
+  function Scanner(term) {
+    this.tokens = new Stack;
+    
+    var prev = { type: T_OPERATOR }; // dummy
+    var match, token, type;
+    
+    while (term.length) {
+      if (!(match = term.match(RE_PATTERN)))
+        throw new Error('syntax error: near `' + term.substr(0, 10) + '``');
+      
+      if ((token = match[1]).length === 0) 
+        throw new Error('syntax error: empty token matched. abort');
+      
+      term = term.substr(token.length);
+      
+      if ((token = token.trim()).length === 0)
+        continue; // whitespace
+      
+      if (!isNaN(token)) {
+        this.tokens.push(prev = new Token(parseFloat(token), T_NUMBER));
+        continue;
+      }
+      
+      switch (type = this.lookup[token] || T_IDENT) {          
+        case T_PLUS:
+          if (prev.type & T_OPERATOR || prev.type === T_POPEN) type = T_UNARY_PLUS;
+          break;
+          
+        case T_MINUS:
+          if (prev.type & T_OPERATOR || prev.type === T_POPEN) type = T_UNARY_MINUS;
+          break;
+          
+        case T_POPEN:
+          switch (prev.type) {
+            case T_IDENT:
+              prev.type = T_FUNCTION;
+              break;
+              
+            case T_NUMBER:
+            case T_PCLOSE:
+              this.tokens.push(new Token('*', T_TIMES));
+              break;
+          }
+          
+          break;
+      }
+      
+      this.tokens.push(prev = new Token(token, type));
+    }
+  }
+  
+  Scanner.prototype = {
+    constructor: Scanner,
+    
+    lookup: {
+      '+': T_PLUS,
+      '-': T_MINUS,
+      '*': T_TIMES,
+      '/': T_DIV,
+      '%': T_MOD,
+      '^': T_POW,
+      '(': T_POPEN,
+      ')': T_PCLOSE,
+      ',': T_COMMA,
+      '!': T_NOT,
+      'π': T_IDENT,
+      '√': T_SQRT
+    },
+    
+    prev: function prev() { return this.tokens.prev(); },
+    next: function next() { return this.tokens.next(); },
+    peek: function peek() { return this.tokens.peek(); }
+  };
+  
+  // ----------------------------------------
+  // parser
+  
+  function Parser(scanner) {
+    this.scanner = scanner;
+    
+    this.queue = new Stack;
+    this.stack = new Stack;
+    
+    var token;
+    
+    while ((token = this.scanner.next()) !== undefined)
+      this.handle(token);
+    
+    while ((token = this.stack.pop()) !== undefined) {
+      if (token.type === T_POPEN || token.type === T_PCLOSE)
+        throw new Error('parse error: unmatched parentheses');
+      
+      this.queue.push(token);
+    }
+  }
+  
+  Parser.parse = function parse(term, ctx) {
+    if (typeof ctx === 'undefined')
+      ctx = new Context;
+    
+    return new Parser(new Scanner(term)).reduce(ctx);
+  };
+  
+  Parser.prototype = {
+    constructor: Parser,
+    
+    reduce: function reduce(ctx) {
+      this.stack = new Stack;
+      var len = 0, token;
+      
+      // While there are input tokens left
+      // Read the next token from input.
+      while ((token = this.queue.shift()) !== undefined) {
+        switch (token.type) {
+          case T_NUMBER:
+          case T_IDENT:
+            // evaluate constant
+            if (token.type === T_IDENT)
+              token = new Token(ctx.cs(token.value), T_NUMBER);
+            
+            // If the token is a value or identifier
+            // Push it onto the stack.
+            this.stack.push(token);
+            ++len;
+            break;
+            
+          case T_PLUS:
+          case T_MINUS:
+          case T_UNARY_PLUS:
+          case T_UNARY_MINUS:
+          case T_TIMES:
+          case T_DIV:
+          case T_MOD:
+          case T_POW:
+          case T_NOT:
+          case T_SQRT:
+            // It is known a priori that the operator takes n arguments.
+            var argc = this.argc(token);
+            
+            // If there are fewer than n values on the stack
+            if (len < argc)
+              throw new Error('runtime error: too few arguments for operator `' + token.value + '`');
+            
+            var rhs = this.stack.pop(),
+                lhs = null;
+            
+            if (argc === 2) lhs = this.stack.pop();              
+            len -= (argc - 1);
+            
+            // Push the returned results, if any, back onto the stack.
+            this.stack.push(new Token(this.op(token.type, lhs, rhs), T_NUMBER));
+            break;
+            
+          case T_FUNCTION:
+            // function
+            var argc = token.argc,
+                argv = [];
+            
+            len -= (argc - 1);
+            
+            for (; argc > 0; --argc)
+              argv.unshift(this.stack.pop().value);
+            
+            // Push the returned results, if any, back onto the stack.
+            this.stack.push(new Token(ctx.fn(token.value, argv), T_NUMBER));
+            break;
+              
+          default:
+            throw new Error('runtime error: unexpected token "' + token.value + '"');
+        }
+      }
+      
+      // If there is only one value in the stack
+      // That value is the result of the calculation.
+      if (this.stack.length === 1)
+        return this.stack.pop().value;
+      
+      // If there are more values in the stack
+      // (Error) The user input has too many values.
+      throw new Error('runtime error: too many values');
+    },
+    
+    op: function op(type, lhs, rhs) {
+      if (lhs !== null) {
+        switch (type) {
+          case T_PLUS:
+            return nadd(lhs.value , rhs.value); // CHANGED BY FM
+            
+          case T_MINUS:
+            return nsub(lhs.value , rhs.value); // CHANGED BY FM
+            
+          case T_TIMES:
+            return ntimes(lhs.value , rhs.value); // CHANGED BY FM
+            
+          case T_DIV:
+            // if (rhs.value === 0.) 
+            //   throw new Error('runtime error: division by zero');
+            
+            return ndiv(lhs.value , rhs.value); // CHANGED BY FM
+            
+          case T_MOD:
+            if (rhs.value === 0.)
+              throw new Error('runtime error: modulo division by zero');
+            
+            return lhs.value % rhs.value;
+            
+          case T_POW:
+            return npow(lhs.value, rhs.value); // CHANGED BY FM
+        }
+        
+        // throw?
+        return 0.;
+      }
+      
+      switch (type) {
+        case T_NOT:
+          return !rhs.value;
+          
+        case T_UNARY_MINUS:
+          return n_unary_minus(rhs.value);  // CHANGED BY FM
+          
+        case T_UNARY_PLUS:
+          return +rhs.value;
+          
+        case T_SQRT:
+          return nsqrt(rhs.value); // CHANGED BY FM
+      }
+      
+      // throw?
+      return 0.;
+    },
+    
+    argc: function argc(token) {
+      switch (token.type) {
+        case T_PLUS:
+        case T_MINUS:
+        case T_TIMES:
+        case T_DIV:
+        case T_MOD:
+        case T_POW:
+          return 2;
+      }
+      
+      return 1;
+    },
+    
+    fargs: function fargs(fn) {
+      this.handle(this.scanner.next()); // '('
+        
+      var argc = 0,
+          next = this.scanner.peek();
+      
+      if (next !== undefined && next.type !== T_PCLOSE) {
+        argc = 1;
+        
+        while ((next = this.scanner.next()) !== undefined) {
+          this.handle(next);
+          
+          if (next.type === T_PCLOSE)
+            break;
+          
+          if (next.type === T_COMMA)
+            ++argc;
+        }
+      }
+      
+      fn.argc = argc;
+    },
+    
+    handle: function handle(token) {
+      switch (token.type) {
+        case T_NUMBER:
+        case T_IDENT:
+          // If the token is a number (identifier), then add it to the output queue.        
+          this.queue.push(token);
+          break;
+          
+        case T_FUNCTION:
+          // If the token is a function token, then push it onto the stack.
+          this.stack.push(token);
+          this.fargs(token);
+          break;
+          
+          
+        case T_COMMA:
+          // If the token is a function argument separator (e.g., a comma):
+          var pe = false;
+          
+          while ((token = this.stack.last()) !== undefined) {
+            if (token.type === T_POPEN) {
+              pe = true;
+              break;
+            }
+            
+            // Until the token at the top of the stack is a left parenthesis,
+            // pop operators off the stack onto the output queue.
+            this.queue.push(this.stack.pop());
+          }
+          
+          // If no left parentheses are encountered, either the separator was misplaced
+          // or parentheses were mismatched.
+          if (pe !== true)
+            throw new Error('parser error: misplaced `,` or unmatched parentheses');
+              
+          break;
+          
+        // If the token is an operator, op1, then:
+        case T_PLUS:
+        case T_MINUS:
+        case T_UNARY_PLUS:
+        case T_UNARY_MINUS: 
+        case T_TIMES:
+        case T_DIV:
+        case T_MOD:
+        case T_POW:
+        case T_NOT:
+        case T_SQRT:
+          var token2;
+          
+          both: while ((token2 = this.stack.last()) !== undefined) {
+            // While there is an operator token, o2, at the top of the stack
+            // op1 is left-associative and its precedence is less than or equal to that of op2,
+            // or op1 has precedence less than that of op2,
+            // Let + and ^ be right associative.
+            // Correct transformation from 1^2+3 is 12^3+
+            // The differing operator priority decides pop / push
+            // If 2 operators have equal priority then associativity decides.
+            switch (token2.type) {
+              default: break both;
+                
+              case T_PLUS:
+              case T_MINUS:
+              case T_UNARY_PLUS:
+              case T_UNARY_MINUS:
+              case T_TIMES:
+              case T_DIV:
+              case T_MOD:
+              case T_POW:
+              case T_NOT:
+              case T_SQRT:
+                var p1 = this.preced(token),
+                    p2 = this.preced(token2);
+                
+                if (!((this.assoc(token) === 1 && (p1 <= p2)) || (p1 < p2)))
+                  break both;
+                  
+                // Pop o2 off the stack, onto the output queue;
+                this.queue.push(this.stack.pop());
+            }
+          }
+          
+          // push op1 onto the stack.
+          this.stack.push(token);
+          break;
+          
+        case T_POPEN:
+          // If the token is a left parenthesis, then push it onto the stack.
+          this.stack.push(token);
+          break;
+          
+        // If the token is a right parenthesis:  
+        case T_PCLOSE:
+          var pe = false;
+          
+          // Until the token at the top of the stack is a left parenthesis,
+          // pop operators off the stack onto the output queue
+          while ((token = this.stack.pop()) !== undefined) {
+            if (token.type === T_POPEN) {
+              // Pop the left parenthesis from the stack, but not onto the output queue.
+              pe = true;
+              break;
+            }
+            
+            this.queue.push(token);
+          }
+          
+          // If the stack runs out without finding a left parenthesis, then there are mismatched parentheses.
+          if (pe !== true)
+            throw new Error('parse error: unmatched parentheses');
+          
+          // If the token at the top of the stack is a function token, pop it onto the output queue.
+          if ((token = this.stack.last()) !== undefined && token.type === T_FUNCTION)
+            this.queue.push(this.stack.pop());
+           
+          break;
+          
+        default:
+          throw new Error('parse error: unknown token "' + token.value + '"');     
+      }
+    },
+    
+    assoc: function assoc(token) {
+      switch (token.type) {
+        case T_TIMES:
+        case T_DIV:
+        case T_MOD:
+        
+        case T_PLUS:
+        case T_MINUS:
+          return 1; //ltr
+        
+        case T_NOT:  
+        case T_UNARY_PLUS:
+        case T_UNARY_MINUS:
+              
+        case T_POW: 
+        case T_SQRT: 
+          return 2; //rtl
+      }
+      
+      return 0; //nassoc
+    },
+  
+    preced: function preced(token) {
+      switch (token.type) {
+        case T_NOT:
+        case T_UNARY_PLUS:
+        case T_UNARY_MINUS:
+          return 4;
+          
+        case T_POW:
+        case T_SQRT:
+          return 3;
+          
+        case T_TIMES:
+        case T_DIV:
+        case T_MOD:
+          return 2;
+          
+        case T_PLUS:
+        case T_MINUS:
+          return 1;
+      }
+      
+      return 0;
+    }
+  };
+  
+  // ----------------------------------------
+  // exports
+  
+  return {
+    Stack:         Stack,
+    Token:         Token,
+    Parser:        Parser,
+    Scanner:       Scanner,
+    Context:       Context,
+    
+    // alias
+    parse: Parser.parse.bind(Parser)
+  };
+});
+
+
+
+function nsqrt(A) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+
+    if(Anum) {
+        return(Math.sqrt(A))
+    }
+
+    var B=new Array(N)
+    for(j=0;j<N;j++) {
+        B[j]=Math.sqrt(A[j])
+    }
+    return(B)
+}
+
+function nadd(A,B) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+    if(typeof(B)==='number') { Bnum=true } else { Bnum=false }
+
+    if(Anum && Bnum) {
+        return(A+B)
+    }
+
+    var C=new Array(N)
+
+    if(Anum && !Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=A+B[j]
+        }
+        return(C)     
+    }
+
+    if(!Anum && Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=A[j]+B
+        }
+        return(C)       
+    }
+
+    for(j=0;j<N;j++) {
+        C[j]=A[j]+B[j]
+    }
+    return(C)
+}
+
+function nsub(A,B) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+    if(typeof(B)==='number') { Bnum=true } else { Bnum=false }
+
+    if(Anum && Bnum) {
+        return(A-B)
+    }
+
+    var C=new Array(N)
+
+    if(Anum && !Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=A-B[j]
+        }
+        return(C)     
+    }
+
+    if(!Anum && Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=A[j]-B
+        }
+        return(C)       
+    }
+
+    for(j=0;j<N;j++) {
+        C[j]=A[j]-B[j]
+    }
+    return(C)
+}
+
+function ndiv(A,B) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+    if(typeof(B)==='number') { Bnum=true } else { Bnum=false }
+
+    if(Anum && Bnum) {
+        return(A/B)
+    }
+
+    var C=new Array(N)
+
+    if(Anum && !Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=A/B[j]
+        }
+        return(C)     
+    }
+
+    if(!Anum && Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=A[j]/B
+        }
+        return(C)       
+    }
+
+    for(j=0;j<N;j++) {
+        C[j]=A[j]/B[j]
+    }
+    return(C)
+}
+
+function ntimes(A,B) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+    if(typeof(B)==='number') { Bnum=true } else { Bnum=false }
+
+    if(Anum && Bnum) {
+        return(A*B)
+    }
+
+    var C=new Array(N)
+
+    if(Anum && !Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=A*B[j]
+        }
+        return(C)     
+    }
+
+    if(!Anum && Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=A[j]*B
+        }
+        return(C)       
+    }
+
+    for(j=0;j<N;j++) {
+        C[j]=A[j]*B[j]
+    }
+    return(C)
+}
+
+function npow(A,B) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+    if(typeof(B)==='number') { Bnum=true } else { Bnum=false }
+
+    if(Anum && Bnum) {
+        return(Math.pow(A,B))
+    }
+
+    var C=new Array(N)
+
+    if(Anum && !Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=Math.pow(A,B[j])
+        }
+        return(C)     
+    }
+
+    if(!Anum && Bnum) {
+        for(j=0;j<N;j++) {
+            C[j]=Math.pow(A[j],B)
+        }
+        return(C)       
+    }
+
+    for(j=0;j<N;j++) {
+        C[j]=Math.pow(A[j],B[j])
+    }
+    return(C)
+}
+
+function n_unary_minus(A) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+
+    if(Anum) {
+        return(-A)
+    }
+    
+    var B=new Array(N)
+    for(j=0;j<N;j++) {
+        B[j]=-A[j]
+    }
+    return(B)
+}
+
+function nsin(A) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+
+    if(Anum) {
+        return(Math.sin(A))
+    }
+    
+    var B=new Array(N)
+    for(j=0;j<N;j++) {
+        B[j]=Math.sin(A[j])
+    }
+    return(B)
+}
+
+
+function ncos(A) {
+    var j
+
+    if(typeof(A)==='number') { Anum=true } else { Anum=false }
+
+    if(Anum) {
+        return(Math.cos(A))
+    }
+    
+    var B=new Array(N)
+    for(j=0;j<N;j++) {
+        B[j]=Math.cos(A[j])
+    }
+    return(B)
+}
+
+// Drawing on the canvas
+
+X0=0.0
+Y0=0.0
+X_EXTENT=1.0
+Y_EXTENT=1.0
+
+function init_xy(width,height) {
+    var j,k
+
+    WIDTH=width
+    HEIGHT=height
+    N=WIDTH*HEIGHT
+
+    if(arguments.length==2) {
+        x=new Array(N)
+        y=new Array(N)
+    }
+    for(j=0;j<HEIGHT;j++) {
+        for(k=0;k<WIDTH;k++) {
+            x[k+j*WIDTH]=X0+X_EXTENT*k/WIDTH
+            y[k+j*WIDTH]=Y0+Y_EXTENT*(HEIGHT-j-1)/HEIGHT
+        }
+    }
+}
+
+function init_img_canvas(width,height) { // prepare x,y,red,green,blue and img
+    init_xy(width,height)
+
+    canvas=document.getElementById('canvas')
+    ctx=canvas.getContext('2d')
+    img=ctx.createImageData(WIDTH,HEIGHT)
+}
+
+function draw_img() { // draw the img contained inside red,green,blue
+    var j,k
+
+    for(j=0;j<N;j++) {
+        k=4*j
+        img.data[k]=255*red[j]
+        img.data[k+1]=255*green[j]
+        img.data[k+2]=255*blue[j]
+        img.data[k+3]=255
+    }
+    ctx.putImageData(img,0,0)
+}
+
+init_img_canvas(500,500)
+
+math_ctx=new Shunt.Context()
+math_ctx.def('x',x)
+math_ctx.def('y',y)
+math_ctx.def('sin',function(a) {return(nsin(a))})
+math_ctx.def('cos',function(a) {return(ncos(a))})
+math_ctx.def('sqrt',function(a) {return(nsqrt(a))})
+
+red_formula="sin(9*(sin(3*x)+sqrt(x^2+y^2)))^4"
+green_formula="cos(10*sqrt(x^2+y^2))^2"
+blue_formula="x"
+
+function img_from_expr() {
+    red=Shunt.parse(red_formula,math_ctx)
+    green=Shunt.parse(green_formula,math_ctx)
+    blue=Shunt.parse(blue_formula,math_ctx)
+
+    draw_img()
+
+    //document.getElementById('formula_display').innerHTML="red="+red_formula+"<br>green="+green_formula+"<br>blue="+blue_formula
+}
+
+img_from_expr()
+
+// user interface
+
+function do_evaluate() {
+    if(arguments && arguments.length>0) {
+        args=Array.from(arguments)
+        txt=args[0]
+    } else {
+        txt=document.getElementById('formula_input_area').value
+    }
+    var patt = /red=(.*)\ngreen=(.*)\nblue=(.*)/g
+    matches=patt.exec(txt)
+    console.log(matches)
+    if(matches) {
+        red_formula=matches[1]
+        green_formula=matches[2]
+        blue_formula=matches[3]
+        img_from_expr()
+    }
+}
+
+//=============================
+// panning/scrolling and zooming
+//=============================
+
+SCROLL_FACTOR=1.0
+
+// mouse is moving (means: dragging, if button is down)
+function mouseMove(evt) {
+    if(evt.buttons>0) {
+            evt.preventDefault()
+
+            pos_x = evt.pageX
+            pos_y = evt.pageY
+
+            if(oldpos_x) {
+                delta_x=pos_x-oldpos_x
+                delta_y=pos_y-oldpos_y
+                X0-=SCROLL_FACTOR*(X_EXTENT*delta_x/WIDTH)
+                Y0+=SCROLL_FACTOR*(Y_EXTENT*delta_y/HEIGHT)
+                init_xy(WIDTH,HEIGHT,false)
+                img_from_expr() 
+            }
+            oldpos_x=pos_x
+            oldpos_y=pos_y
+    } else {
+        oldpos_x=null
+    }
+}
+
+oldpos_x=null
+oldpos_y=null
+
+function mouseWheel(e) {
+    if(e.deltaY>0) {
+        var factor=1.02
+    } else {
+        var factor=1/1.02
+    }
+    X0-=0.5*X_EXTENT*(factor-1)
+    Y0-=0.5*Y_EXTENT*(factor-1)
+    X_EXTENT*=factor
+    Y_EXTENT*=factor
+    init_xy(WIDTH,HEIGHT,false)
+    img_from_expr()                
+    e.preventDefault() // stop whole page from scrolling
+}
+
+function touchMove(evt) {
+    evt.buttons=1 // to fool the mouseMove function
+    mouseMove(evt)
+}
+
+canvas.addEventListener("mousemove",mouseMove)
+canvas.addEventListener("touchmove",touchMove)
+canvas.addEventListener("mousewheel",mouseWheel)
+
+
+//=======================
+// The expression panel
+//=======================
+
+function setAttributes(elem,attributes) {
+    for (var i = 1; i < attributes.length; i+=2) {
+        elem.setAttribute(attributes[i],attributes[i+1]);
+    }
+}
+
+function add_element() {
+    args=Array.from(arguments)
+    var shape = document.createElement(args[0]);
+    setAttributes(shape,args);
+    document.getElementById("basic_div").appendChild(shape);
+    return shape;
+}
+
+function hide_panel() {
+    panel.remove()
+    panel=null
+}
+
+function click_canvas(evt) {
+    if(evt.pageY<400) { // in the upper part: rather try to drag/scroll
+        return
+    }
+    if(!panel) {
+        panel=add_element("div","class","vertical-center")
+        
+        panel.style="position:absolute;width:400px;margin-left:auto;margin-right:auto;left:0;right:0;color:white;background-color:rgba(0,0,0,0.5);font-family:Helvetica;font-weight:100;border-radius:5px;padding:10px"
+        panel.innerHTML="<p>Art from Math:</p><textarea spellcheck=false id='formula_input_area' style='color: white; width:400px; max-width:400px; height:150px; background-color: transparent;font-family:Courier;font-size:1em'>red="+red_formula+"\ngreen="+green_formula+"\nblue="+blue_formula+"\n</textarea> <br><br> <button class='mybutton' onclick='do_evaluate()'>Evaluate</button> <button class='mybutton' onclick='hide_panel()'>Hide this panel</button><br><p style='color:white;font-size:0.5em'>2020 by Florian Marquardt; MIT license; Expression parser by droptable (see github)</p>"
+    }
+}
+
+
+//===========================
+// The image selection panel
+//===========================
+
+const PANEL_IMAGE_LIST_COLUMNS=3
+
+const THUMBNAIL_WIDTH=200
+const THUMBNAIL_HEIGHT=200
+
+function show_image_list() {
+    if(!panel_image_list) {
+        panel_image_list=add_element("div")
+        panel_image_list.style="position:absolute;top:30%;width:650px;height:400px;margin-left:auto;margin-right:auto;left:0;right:0;color:white;background-color:rgba(0,0,0,0.5);font-family:Helvetica;font-weight:100;border-style:solid;border-color:white;border-width:4px;border-radius:10px;padding:10px;overflow-y:auto"
+        for(var j=0;j<image_list.length;j++) {
+            if(j%PANEL_IMAGE_LIST_COLUMNS==0) {
+                panel_image_list.appendChild(document.createElement('br'))
+            }
+            panel_image_list.appendChild(image_list[j])
+        }
+    }
+}
+
+
+
+const formula_list=[
+
+`red=sin(50*(x*x+y*y)^2)
+green=cos(30*(y*y))
+blue=x*x`,
+`red=sin(50*(x*x+y*y)^2)
+green=cos(30*(y*y-x*x))
+blue=x*x+y*y
+`,
+`red=sin(50*((x-0.5)^2+(y-0.3)^2)^2)
+green=cos(30*(y^2-x^2))
+blue=x*x+y*y
+`,
+`red=1/(0.01^(cos(50*sqrt((x-0.5)^2+(y-0.3)^2)^2))+1)
+green=cos(30*(y^2-x^2))
+blue=x*x+y*y
+`,
+`red=1/(0.01^(cos(50*sqrt((x-0.5)^2+(y-0.3)^2)^2))+1)
+green=0*x
+blue=sin(20*(x*x+y*y))
+`,
+`red=1/(0.01^(cos(50*sqrt((x-0.5)^2+(y-0.3)^2)^2))+1)
+green=x
+blue=sin(20*(x*x+y*y))
+`,
+`red=10^sin(30*sqrt(x^2+y^2))
+green=10^sin(30*sqrt((x-1)^2+y^2))
+blue=10^sin(30*sqrt((x-1)^2+(y-1)^2))
+`,
+`red=(1e-20)^(((x-0.5)^2+(y-0.5)^2)^2)
+green=(1e-30)^(((x-0.5)^2+(y-0.5)^2)^2)
+blue=0*x
+`,
+`red=(1e-20)^(((x-0.5)^2+(y-0.5)^2)^2)
+green=(1e-30)^(((x-0.5)^2+(y-0.5)^2)^2)
+blue=(1e-70)^(((x-0.3)^2+(y-0.3)^2)^2)
+`,
+`red=(1e-20)^(((x-0.5)^2+(y-0.5)^2)^2)
+green=(1e-30)^(((x-0.5)^2+(y-0.5)^2)^2)
+blue=(1e-70)^(200*((x-0.4)^2+(y-0.4)^2)^4)
+`,
+`red=sin(9*(sin(3*x)+sqrt(x^2+y^2)))^4
+green=cos(10*sqrt(x^2+y^2))^2
+blue=10^sin(20*x)
+`,
+`red=sin(9*(sin(3*x)+sqrt(x^2+y^2)))^4
+green=cos(10*sqrt(x^2+y^2))^2
+blue=5^(sin(40*x+20*y^2)+2*cos(30*(x^2+y^2)))
+`,
+`red=0.3^(sin(40*sqrt((x-0.2)^2+(y-0.5)^2))+sin(40*sqrt((x-0.8)^2+(y-0.5)^2)))
+green=3^(sin(40*sqrt((x-0.2)^2+(y-0.5)^2))+sin(40*sqrt((x-0.8)^2+(y-0.5)^2)))
+blue=5^(sin(40*sqrt((x-0.2)^2+(y-0.5)^2))+sin(40*sqrt((x-0.8)^2+(y-0.5)^2)))
+`,
+`red=0.3^(sin(40*sqrt((x-0.2)^2+(y-0.5)^2))+sin(40*sqrt((x-0.8)^2+(y-0.5)^2)))
+green=3^(sin(40*sqrt((x-0.2)^2+(y-0.5)^2))+sin(40*sqrt((x-0.8)^2+(y-0.5)^2)))
+blue=5^(sin(40*sqrt((x-0.2)^2+(y-0.5)^2))+sin(40*sqrt((x-0.8)^2+(y-0.5)^2)) + sin(40*sqrt((x-0.5)^2+(y-0.3)^2)))
+`]
+
+function select_image(evt) {
+    do_evaluate(evt.target.formula)
+}
+
+function create_image_list() {
+    // store old definitions:
+    x_old=x
+    y_old=y
+    ctx_old=ctx
+    img_old=img
+    WIDTH_old=WIDTH
+    HEIGHT_old=HEIGHT
+    N_old=N
+
+    image_list=[]
+    init_xy(THUMBNAIL_WIDTH,THUMBNAIL_HEIGHT)
+    math_ctx.def('x',x)
+    math_ctx.def('y',y)
+    for(var k=0;k<formula_list.length;k++) {
+        var image_canvas=document.createElement('canvas')
+        image_canvas.setAttribute("width",THUMBNAIL_WIDTH)
+        image_canvas.setAttribute("height",THUMBNAIL_HEIGHT)
+        var basic_style="border-radius:10px;padding:3px;border-width:2px;border-style:solid;border-color:transparent"
+        image_canvas.style=basic_style
+        image_canvas.addEventListener("click",select_image)
+        image_canvas.addEventListener("mouseover",function (evt) { evt.target.style="border-radius:10px;padding:3px;border-width:2px;border-style:solid;border-color:white"})
+        image_canvas.addEventListener("mouseleave",function (evt) { evt.target.style=basic_style })
+
+        image_canvas.formula=formula_list[k]
+        ctx=image_canvas.getContext('2d')
+        img=ctx.createImageData(THUMBNAIL_WIDTH,THUMBNAIL_HEIGHT)
+        do_evaluate(formula_list[k]) // will draw into img
+        image_list.push(image_canvas)
+    }
+
+    // recall old definitions:
+    x=x_old
+    y=y_old
+    ctx=ctx_old
+    img=img_old
+    math_ctx.def('x',x)
+    math_ctx.def('y',y)
+    WIDTH=WIDTH_old
+    HEIGHT=HEIGHT_old
+    N=N_old
+    
+}
+
+canvas.addEventListener("click",click_canvas)
+panel=null
+panel_image_list=null
+
+//create_image_list()
+//show_image_list()
+</script>
+
+
+</body>
+</html>
