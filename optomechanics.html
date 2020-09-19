@@ -4,22 +4,17 @@
 				<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 <style>
-#button {
+.mybutton {
 	background-color:#00AA80;
 	text-align:center;
 	border-radius:5px;
-	font-family:Verdana;
+	font-family:Helvetica;
+    font-weight:100;
 	padding:3px;
 	user-select: none;
 }
-#button:hover {
+.mybutton:hover {
 	background-color:#FF8000
-}
-#slider {
-	background-color:#00AA80;
-	border-radius:5px;
-	font-family:Verdana;
-	padding:3px;
 }
 </style>
 
@@ -107,11 +102,148 @@ Cavity Optomechanics Simulator
             </datalist>
     </div>
 
+    <p class="mybutton" onclick="define_sweep_start()">Define sweep start</p>
+    <p class="mybutton" onclick="define_sweep_end()">Define sweep end</p>
+    <div id="sweep_time_input_div" class="slider">
+        <label>Sweep time / &Omega;=</label> <label id="sweep_time_text">1</label>
+        <input id="sweep_time_input" style="width:100%" type="range" list="tickmarks" min="1" max="6" value="2" step="0.01" oninput="change_sweep_time()">
+        <datalist id="tickmarks">
+            <option value="1" label="10"></option>
+            <option value="2" label="1e2"></option>
+            <option value="3" label="1e3"></option>
+            <option value="4" label="1e4"></option>
+            <option value="5" label="1e5"></option>
+            </datalist>
+    </div>
+
+    <label>
+    <input type="checkbox" onclick="activate_sweep(this)"/>
+    <div>Activate sweep</div>
+    </label>
+
 	<p style="font-size:14;color:lightseagreen">Tirth Shah & Florian Marquardt 2020<br>OMT, supported by the E.U.</p>
 </div>
 
 <script>
-// graphics routines
+// User interface actions
+function change_detuning() {
+    Detuning=parseFloat(document.getElementById('detuning_input').value)
+    document.getElementById('detuning_text').innerHTML=Detuning
+    if(sweep_active) {
+        do_sweep()
+    }
+}
+
+function change_kappa() {
+    kappa=parseFloat(document.getElementById('kappa_input').value)
+    document.getElementById('kappa_text').innerHTML=kappa
+    LaserDrive=Math.sqrt(kappa)*alpha_in
+    if(sweep_active) {
+        do_sweep()
+    }
+}
+
+function change_gamma() {
+    Gamma=Math.pow(10,parseFloat(document.getElementById('gamma_input').value))
+    document.getElementById('gamma_text').innerHTML=Gamma.toPrecision(2)
+    if(sweep_active) {
+        do_sweep()
+    }
+}
+
+function change_g0() {
+    g0=parseFloat(document.getElementById('g0_input').value)
+    document.getElementById('g0_text').innerHTML=g0
+    if(sweep_active) {
+        do_sweep()
+    }
+}
+
+function change_alpha_in() {
+    alpha_in_2=Math.pow(10,parseFloat(document.getElementById('alpha_in_input').value))
+    document.getElementById('alpha_in_text').innerHTML=alpha_in_2.toPrecision(2)
+    alpha_in=Math.sqrt(alpha_in_2)
+    LaserDrive=Math.sqrt(kappa)*alpha_in
+    if(sweep_active) {
+        do_sweep()
+    }
+}
+
+function change_sweep_time() {
+    sweep_time=Math.pow(10,parseFloat(document.getElementById('sweep_time_input').value))
+    document.getElementById('sweep_time_text').innerHTML=sweep_time.toPrecision(2)
+    if(sweep_active) {
+        do_sweep()
+    }
+}
+
+function define_sweep_start() {
+    Detuning_start=Detuning
+    alpha_in_start=alpha_in
+    kappa_start=kappa
+    Gamma_start=Gamma
+    g0_start=g0
+}
+
+function define_sweep_end() {
+    Detuning_end=Detuning
+    alpha_in_end=alpha_in
+    kappa_end=kappa
+    Gamma_end=Gamma
+    g0_end=g0
+}
+
+function activate_sweep(checkboxbutton) {
+    if(checkboxbutton.checked) {
+        sweep_active=true
+        do_sweep()
+    } else {
+        sweep_active=false
+    }
+}
+
+function do_sweep() {
+    time_idx=0
+
+    tmax=max_time_idx*DT
+
+    var SMALL_NUMBER=1e-10
+
+    if(Math.abs(Detuning_end-Detuning_start)<SMALL_NUMBER) { Detuning_sweep=false } else { Detuning_sweep=true }
+    if(Math.abs(alpha_in_end-alpha_in_start)<SMALL_NUMBER) { alpha_in_sweep=false } else { alpha_in_sweep=true }
+    if(Math.abs(kappa_end-kappa_start)<SMALL_NUMBER) { kappa_sweep=false } else { kappa_sweep=true }
+    if(Math.abs(Gamma_end-Gamma_start)<SMALL_NUMBER) { Gamma_sweep=false } else { Gamma_sweep=true }
+    if(Math.abs(g0_end-g0_start)<SMALL_NUMBER) { g0_sweep=false } else { g0_sweep=true }
+
+    X=[0.,0.,0.,0.]
+    DT_big_step=sweep_time/max_time_idx
+    var t=0.0
+    var t_step=0.0
+
+    for(time_idx=0;time_idx<max_time_idx;time_idx++) {
+        s=time_idx*DT/tmax
+        if(Detuning_sweep) { Detuning=(1-s)*Detuning_start+s*Detuning_end }
+        if(alpha_in_sweep) { alpha_in=(1-s)*alpha_in_start+s*alpha_in_end }
+        if(kappa_sweep) { kappa=(1-s)*kappa_start+s*kappa_end }
+        if(Gamma_sweep) { Gamma=(1-s)*Gamma_start+s*Gamma_end }
+        if(g0_sweep) { g0=(1-s)*g0_start+s*g0_end }
+        LaserDrive=Math.sqrt(kappa)*alpha_in
+
+        t_step=t_step+DT_big_step
+        while(t<t_step) {
+            rkstep()
+            t+=DT
+        }
+
+        // keep records of time traces
+        X_record[time_idx]=X[0]
+        alpha2_record[time_idx]=X[2]*X[2]+X[3]*X[3]
+    }
+
+    plot_X_and_alpha2()
+}
+
+// graphics
 
 function circle(x, y, r,color) {
 	var shape = document.createElementNS ('http://www.w3.org/2000/svg', 'circle')
@@ -122,35 +254,6 @@ function circle(x, y, r,color) {
 	canvas.appendChild(shape)
 	return(shape)
 }
-
-function change_detuning() {
-    Detuning=parseFloat(document.getElementById('detuning_input').value)
-    document.getElementById('detuning_text').innerHTML=Detuning
-}
-
-function change_kappa() {
-    kappa=parseFloat(document.getElementById('kappa_input').value)
-    document.getElementById('kappa_text').innerHTML=kappa
-    LaserDrive=Math.sqrt(kappa)*alpha_in
-}
-
-function change_gamma() {
-    Gamma=Math.pow(10,parseFloat(document.getElementById('gamma_input').value))
-    document.getElementById('gamma_text').innerHTML=Gamma.toPrecision(2)
-}
-
-function change_g0() {
-    g0=parseFloat(document.getElementById('g0_input').value)
-    document.getElementById('g0_text').innerHTML=g0
-}
-
-function change_alpha_in() {
-    alpha_in=Math.pow(10,parseFloat(document.getElementById('alpha_in_input').value))
-    document.getElementById('alpha_in_text').innerHTML=alpha_in.toPrecision(2)
-    LaserDrive=Math.sqrt(kappa)*alpha_in
-}
-
-// graphics
 
 function setAttributes(elem,attributes) {
     for (var i = 1; i < attributes.length; i+=2) {
@@ -210,7 +313,7 @@ function plot(x,y,x0,y0,width,height,color,linewidth,existing_shape) {
         existing_shape.setAttribute("transform","translate("+x0+","+y0+") scale("+sx+","+sy+")")
     } else {
         return(add_graphics("polyline","points",string,"stroke",color,"stroke-width",
-        linewidth,"vector-effect","non-scaling-stroke",
+        linewidth, "stroke-linejoin", "round", "vector-effect","non-scaling-stroke",
         "fill","none","transform","translate("+x0+","+y0+") scale("+sx+","+sy+")"))
     }
 }
@@ -233,8 +336,8 @@ function add_mul(c,a,lambda,b) { // set c=a+lambda*b for whole arrays
     }
 }
 
-function animate() {
-    // Runge Kutta 4th order
+// Runge Kutta 4th order
+function rkstep() {
     dX1=rhs(X)
     add_mul(Xnew,X,0.5*DT,dX1)
     dX2=rhs(Xnew)
@@ -245,21 +348,32 @@ function animate() {
     for(j=0;j<X.length;j++) {
         X[j]+=DT6*(dX1[j]+2*dX2[j]+2*dX3[j]+dX4[j])
     }
+}
 
-    // keep records of time traces
-    X_record[time_idx]=X[0]
-    alpha2_record[time_idx]=X[2]*X[2]+X[3]*X[3]
-    time_idx+=1
-    if(time_idx>=max_time_idx) {
-        time_idx=0
-    }
-
-    // show graphics (update plots)
-    shape_mass_point.setAttribute("cx",MASSPOINT_X0+MASSPOINT_XSCALE*X[0])
+function plot_X_and_alpha2() { // update both plot panels
     plot(times_record,X_record,TIMETRACE_X0,TIMETRACE_Y0,TIMETRACE_XWIDTH,
-    TIMETRACE_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,shape_timetrace)
+        TIMETRACE_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,shape_timetrace)
     plot(times_record,alpha2_record,TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0,TIMETRACE_ALPHA2_XWIDTH,
-    TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,shape_alpha2_timetrace)
+        TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,shape_alpha2_timetrace)
+}
+
+function animate() {
+    if(!sweep_active) { // if we are not currently in sweeping mode
+        rkstep()
+
+        // keep records of time traces
+        X_record[time_idx]=X[0]
+        alpha2_record[time_idx]=X[2]*X[2]+X[3]*X[3]
+        time_idx+=1
+        if(time_idx>=max_time_idx) { // wrap around
+            time_idx=0
+        }
+
+        // show graphics (update plots)
+        shape_mass_point.setAttribute("cx",MASSPOINT_X0+MASSPOINT_XSCALE*X[0])
+
+        plot_X_and_alpha2()
+    }
 }
 
 //============ MAIN ==========
@@ -299,20 +413,23 @@ DT=0.2
 DT6=DT/6.0
 
 // parameters for display
-max_time_idx=400 // how many points to store for displaying time trace
+max_time_idx=1000 // how many points to store for displaying time trace
 
 // Physics
 // Variables
 X=[1.0,0.0,0.0,0.0] // position,velocity,real(alpha),imag(alpha)
 Xnew=Array(X.length)
 
+sweep_active=false // whether we are in sweeping mode
+alpha_in=1.0 // because it will be accessed in change_kappa already
+
 // Parameters: Obtain them from sliders for the first time
 change_detuning() // obtain Detuning value
-alpha_in=1.0 // because it will be accessed in change_kappa already
 change_kappa()
 change_gamma()
 change_g0()
 change_alpha_in()
+change_sweep_time()
 
 // prepare time trace
 X_record=new Array(max_time_idx)
