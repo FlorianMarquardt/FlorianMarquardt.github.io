@@ -107,7 +107,7 @@ Cavity Optomechanics Simulator
             </datalist>
     </div>
 
-	<p style="font-size:14;color:lightseagreen">Florian Marquardt 2020<br>OMT, supported by the E.U.</p>
+	<p style="font-size:14;color:lightseagreen">Tirth Shah & Florian Marquardt 2020<br>OMT, supported by the E.U.</p>
 </div>
 
 <script>
@@ -150,6 +150,8 @@ function change_alpha_in() {
     LaserDrive=Math.sqrt(kappa)*alpha_in
 }
 
+// graphics
+
 function setAttributes(elem,attributes) {
     for (var i = 1; i < attributes.length; i+=2) {
         elem.setAttribute(attributes[i],attributes[i+1])
@@ -164,9 +166,34 @@ function add_graphics() {
     return shape
 }
 
-function plot(x,y,x0,y0,sx,sy,color,linewidth,existing_shape) {
+function HTMLObject(x,y,width,height,htmlcode,textstyle) {
+    var fo= document.createElementNS ('http://www.w3.org/2000/svg', 'foreignObject')
+    fo.setAttribute("x",x)
+    fo.setAttribute("y",y)
+    fo.setAttribute("width",width)
+    fo.setAttribute("height",height)         
+    var newDiv = document.createElement('div')
+    newDiv.style=textstyle
+    newDiv.innerHTML=htmlcode
+    fo.appendChild(newDiv)
+    canvas.appendChild(fo)
+    return(fo)
+}
+
+function plot(x,y,x0,y0,width,height,color,linewidth,existing_shape) {
     var string,X,Y
     var j,N=x.length
+
+    var maxy=Math.max(...y)
+    var miny=Math.min(...y)
+    var maxx=Math.max(...x)
+    var minx=Math.min(...x)
+    if(maxx-minx<1e-3) { maxx=minx+1e-3 }
+    if(maxy-miny<1e-3) { maxy=miny+1e-3 }
+    var sy=height/(maxy-miny)
+    var sx=width/(maxx-minx)
+    y0-=miny*sy
+    x0-=minx*sx
 
     for(j=0;j<N;j++) {
         X=x[j]
@@ -180,11 +207,16 @@ function plot(x,y,x0,y0,sx,sy,color,linewidth,existing_shape) {
 
     if(existing_shape!=null) {
         existing_shape.setAttribute("points",string)
+        existing_shape.setAttribute("transform","translate("+x0+","+y0+") scale("+sx+","+sy+")")
     } else {
         return(add_graphics("polyline","points",string,"stroke",color,"stroke-width",
         linewidth,"vector-effect","non-scaling-stroke",
         "fill","none","transform","translate("+x0+","+y0+") scale("+sx+","+sy+")"))
     }
+}
+
+function plot_background(x0,y0,width,height,fillcolor,bordercolor,borderwidth) {
+    return(add_graphics("rect","x",x0,"y",y0,"width",width,"height",height,"fill",fillcolor,"stroke",bordercolor,"stroke-width",borderwidth))
 }
 
 // Runge Kutta and animation
@@ -214,6 +246,7 @@ function animate() {
         X[j]+=DT6*(dX1[j]+2*dX2[j]+2*dX3[j]+dX4[j])
     }
 
+    // keep records of time traces
     X_record[time_idx]=X[0]
     alpha2_record[time_idx]=X[2]*X[2]+X[3]*X[3]
     time_idx+=1
@@ -221,11 +254,12 @@ function animate() {
         time_idx=0
     }
 
+    // show graphics (update plots)
     shape_mass_point.setAttribute("cx",MASSPOINT_X0+MASSPOINT_XSCALE*X[0])
-    plot(times_record,X_record,TIMETRACE_X0,TIMETRACE_Y0,TIMETRACE_XSCALE,
-    TIMETRACE_YSCALE,TIMETRACE_COLOR,TIMETRACE_WIDTH,shape_timetrace)
-    plot(times_record,alpha2_record,TIMETRACE_X0,TIMETRACE_ALPHA2_Y0,TIMETRACE_XSCALE,
-    TIMETRACE_ALPHA2_YSCALE,TIMETRACE_COLOR,TIMETRACE_WIDTH,shape_alpha2_timetrace)
+    plot(times_record,X_record,TIMETRACE_X0,TIMETRACE_Y0,TIMETRACE_XWIDTH,
+    TIMETRACE_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,shape_timetrace)
+    plot(times_record,alpha2_record,TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0,TIMETRACE_ALPHA2_XWIDTH,
+    TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,shape_alpha2_timetrace)
 }
 
 //============ MAIN ==========
@@ -234,18 +268,31 @@ function animate() {
 // Graphics parameters
 MASSPOINT_X0=50
 MASSPOINT_Y0=70
-MASSPOINT_XSCALE=2
-MASSPOINT_RADIUS=5
+MASSPOINT_XSCALE=0.01
+MASSPOINT_RADIUS=3
 
 TIMETRACE_COLOR="orange"
-TIMETRACE_WIDTH=2
+TIMETRACE_LINEWIDTH=2
+PLOT_BACKGROUND_COLOR="dimgrey"
+PLOT_BORDER_COLOR="white"
+PLOT_BORDER_WIDTH=0.2
+PLOT_LABEL_HEIGHT=5
+PLOT_LABEL_SHIFT=-2
+PLOT_LABEL_BACKGROUND_COLOR="orange"
+PLOT_LABEL_TEXT_COLOR="white"
+PLOT_LABEL_BEGIN="<p style='margin:auto;background-color:rgba(0,150,200,0.8);width:30%;padding:1px;border-radius:2px'>"
+PLOT_LABEL_END="</p>"
+PLOT_LABEL_TEXT_STYLE="font-size:2;font-family:Helvetica;font-weight:100;color:white"
+
 TIMETRACE_X0=10
 TIMETRACE_Y0=30
-TIMETRACE_XSCALE=1
-TIMETRACE_YSCALE=-0.5
+TIMETRACE_XWIDTH=80
+TIMETRACE_YWIDTH=-10
 
-TIMETRACE_ALPHA2_Y0=20
-TIMETRACE_ALPHA2_YSCALE=-0.8
+TIMETRACE_ALPHA2_Y0=15
+TIMETRACE_ALPHA2_X0=10
+TIMETRACE_ALPHA2_YWIDTH=-10
+TIMETRACE_ALPHA2_XWIDTH=80
 
 // Numerics parameters
 DT=0.2
@@ -282,10 +329,22 @@ time_idx=0
 canvas=document.getElementById("canvas")
 shape_mass_point=circle(MASSPOINT_X0+MASSPOINT_XSCALE*X[0],MASSPOINT_Y0,MASSPOINT_RADIUS,"orange")
 // plot of time trace (curve will be modified later)
-shape_timetrace=plot(times_record,X_record,TIMETRACE_X0,TIMETRACE_Y0,
-    TIMETRACE_XSCALE,TIMETRACE_YSCALE,TIMETRACE_COLOR,TIMETRACE_WIDTH,null)
-shape_alpha2_timetrace=plot(times_record,alpha2_record,TIMETRACE_X0,TIMETRACE_ALPHA2_Y0,
-    TIMETRACE_XSCALE,TIMETRACE_ALPHA2_YSCALE,TIMETRACE_COLOR,TIMETRACE_WIDTH,null)
+plot_background(TIMETRACE_X0,TIMETRACE_Y0+TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_XWIDTH,-TIMETRACE_YWIDTH,
+PLOT_BACKGROUND_COLOR,PLOT_BORDER_COLOR,PLOT_BORDER_WIDTH)
+shape_timetrace=plot(times_record,X_record,TIMETRACE_X0,TIMETRACE_Y0,TIMETRACE_XWIDTH,
+    TIMETRACE_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,null)
+    HTMLObject(TIMETRACE_X0,TIMETRACE_Y0+TIMETRACE_ALPHA2_YWIDTH+PLOT_LABEL_SHIFT,TIMETRACE_XWIDTH,
+PLOT_LABEL_HEIGHT,PLOT_LABEL_BEGIN+"Position x/x<sub>ZPF</sub>"+PLOT_LABEL_END,PLOT_LABEL_TEXT_STYLE)
+
+plot_background(TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0+TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_ALPHA2_XWIDTH,
+    -TIMETRACE_ALPHA2_YWIDTH,PLOT_BACKGROUND_COLOR,PLOT_BORDER_COLOR,PLOT_BORDER_WIDTH)
+shape_alpha2_timetrace=plot(times_record,alpha2_record,TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0,TIMETRACE_ALPHA2_XWIDTH,
+    TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,null)
+HTMLObject(TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0+TIMETRACE_ALPHA2_YWIDTH+PLOT_LABEL_SHIFT,TIMETRACE_ALPHA2_XWIDTH,
+PLOT_LABEL_HEIGHT,PLOT_LABEL_BEGIN+"Intensity |&alpha;|<sup>2</sup>"+PLOT_LABEL_END,PLOT_LABEL_TEXT_STYLE)
+    //rubberbox(TIMETRACE_X0,TIMETRACE_Y0+TIMETRACE_ALPHA2_YWIDTH,1,
+//   "Intensity |&alpha;|<sup>2</sup>",PLOT_LABEL_BACKGROUND_COLOR,PLOT_LABEL_TEXT_COLOR,PLOT_LABEL_TEXT_STYLE)
+
 
 // Start animation loop
 setInterval(animate,20)
