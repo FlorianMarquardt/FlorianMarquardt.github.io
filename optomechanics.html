@@ -47,7 +47,7 @@ Cavity Optomechanics Simulator
 
 	<div id="detuning_input_div" class="slider">
 	<label>Detuning &Delta;/&Omega;=</label> <label id="detuning_text">1</label>
-    <input id="detuning_input" style="width:100%" type="range" list="tickmarks" min="-3" max="3" value="1" step="0.01" oninput="change_detuning()">
+    <input id="detuning_input" style="width:100%" type="range" list="tickmarks" min="-3" max="3" value="1" step="0.01" oninput="change_detuning(true)">
     <datalist id="tickmarks">
         <option value="0" label="0"></option>
         <option value="1" label="1"></option>
@@ -59,7 +59,7 @@ Cavity Optomechanics Simulator
 
 	<div id="kappa_input_div" class="slider">
         <label>Cavity decay &kappa;/&Omega;=</label> <label id="kappa_text">1</label>
-        <input id="kappa_input" style="width:100%" type="range" list="tickmarks" min="0" max="3" value="1" step="0.01" oninput="change_kappa()">
+        <input id="kappa_input" style="width:100%" type="range" list="tickmarks" min="0" max="3" value="1" step="0.01" oninput="change_kappa(true)">
         <datalist id="tickmarks">
             <option value="0" label="0"></option>
             <option value="0.1" label="0.1"></option>
@@ -70,7 +70,7 @@ Cavity Optomechanics Simulator
 
     <div id="Gamma_input_div" class="slider">
         <label>Mechanical damping &Gamma;/&Omega;=</label> <label id="gamma_text">1</label>
-        <input id="gamma_input" style="width:100%" type="range" list="tickmarks" min="-4" max="0" value="-2" step="0.01" oninput="change_gamma()">
+        <input id="gamma_input" style="width:100%" type="range" list="tickmarks" min="-4" max="0" value="-2" step="0.01" oninput="change_gamma(true)">
         <datalist id="tickmarks">
             <option value="-4" label="1e-4"></option>
             <option value="-3" label="1e-3"></option>
@@ -82,7 +82,7 @@ Cavity Optomechanics Simulator
 
     <div id="g0_input_div" class="slider">
         <label>Coupling g<sub>0</sub>/&Omega;=</label> <label id="g0_text">1</label>
-        <input id="g0_input" style="width:100%" type="range" list="tickmarks" min="0" max="0.001" value="0.0001" step="0.000001" oninput="change_g0()">
+        <input id="g0_input" style="width:100%" type="range" list="tickmarks" min="0" max="0.001" value="0.0001" step="0.000001" oninput="change_g0(true)">
         <datalist id="tickmarks">
             <option value="0" label="0"></option>
             <option value="0.0001" label="10<sup>-4</sup>"></option>
@@ -92,7 +92,7 @@ Cavity Optomechanics Simulator
 
     <div id="alpha_in_input_div" class="slider">
         <label>Drive (photons/time) |&alpha;<sub>in</sub>|<sup>2</sup>/&Omega;=</label> <label id="alpha_in_text">1</label>
-        <input id="alpha_in_input" style="width:100%" type="range" list="tickmarks" min="-3" max="6" value="1.0" step="0.01" oninput="change_alpha_in()">
+        <input id="alpha_in_input" style="width:100%" type="range" list="tickmarks" min="-3" max="6" value="1.0" step="0.01" oninput="change_alpha_in(true)">
         <datalist id="tickmarks">
             <option value="-3" label="10<sup>-3</sup>"></option>
             <option value="-2" label="10<sup>-2</sup>"></option>
@@ -143,46 +143,56 @@ Cavity Optomechanics Simulator
 
 <script>
 // User interface actions
-function change_detuning() {
+function change_detuning(also_sweep) {
     Detuning=parseFloat(document.getElementById('detuning_input').value)
     document.getElementById('detuning_text').innerHTML=Detuning
-    if(sweep_active) {
-        fresh_sweep()
+    if(also_sweep) {
+        if(sweep_active) {
+            fresh_sweep()
+        }
     }
 }
 
-function change_kappa() {
+function change_kappa(also_sweep) {
     kappa=parseFloat(document.getElementById('kappa_input').value)
     document.getElementById('kappa_text').innerHTML=kappa
     LaserDrive=Math.sqrt(kappa)*alpha_in
-    if(sweep_active) {
-        fresh_sweep()
+    if(also_sweep) {
+        if(sweep_active) {
+            fresh_sweep()
+        }
     }
 }
 
-function change_gamma() {
+function change_gamma(also_sweep) {
     Gamma=Math.pow(10,parseFloat(document.getElementById('gamma_input').value))
     document.getElementById('gamma_text').innerHTML=Gamma.toPrecision(2)
-    if(sweep_active) {
-        fresh_sweep()
+    if(also_sweep) {
+        if(sweep_active) {
+            fresh_sweep()
+        }
     }
 }
 
-function change_g0() {
+function change_g0(also_sweep) {
     g0=parseFloat(document.getElementById('g0_input').value)
     document.getElementById('g0_text').innerHTML=g0
-    if(sweep_active) {
-        fresh_sweep()
+    if(also_sweep) {
+        if(sweep_active) {
+            fresh_sweep()
+        }
     }
 }
 
-function change_alpha_in() {
+function change_alpha_in(also_sweep) {
     alpha_in_2=Math.pow(10,parseFloat(document.getElementById('alpha_in_input').value))
     document.getElementById('alpha_in_text').innerHTML=alpha_in_2.toPrecision(2)
     alpha_in=Math.sqrt(alpha_in_2)
     LaserDrive=Math.sqrt(kappa)*alpha_in
-    if(sweep_active) {
-        fresh_sweep()
+    if(also_sweep) {
+        if(sweep_active) {
+            fresh_sweep()
+        }
     }
 }
 
@@ -192,6 +202,14 @@ function change_sweep_time() {
     if(sweep_active) {
         fresh_sweep()
     }
+}
+
+function query_all_parameters() {
+    change_detuning(false) // obtain Detuning value
+    change_kappa(false)
+    change_gamma(false)
+    change_g0(false)
+    change_alpha_in(false)
 }
 
 function animate_clicked_button(obj) {
@@ -207,6 +225,7 @@ function fresh_sweep() {
 }
 
 function define_sweep_start(button_element) {
+    query_all_parameters()
     Detuning_start=Detuning
     alpha_in_start=alpha_in
     kappa_start=kappa
@@ -219,6 +238,7 @@ function define_sweep_start(button_element) {
 }
 
 function define_sweep_end(button_element) {
+    query_all_parameters()
     Detuning_end=Detuning
     alpha_in_end=alpha_in
     kappa_end=kappa
@@ -231,6 +251,7 @@ function define_sweep_end(button_element) {
 }
 
 function define_Vsweep_start(button_element) {
+    query_all_parameters()
     Detuning_Vstart=Detuning
     alpha_in_Vstart=alpha_in
     kappa_Vstart=kappa
@@ -243,6 +264,7 @@ function define_Vsweep_start(button_element) {
 }
 
 function define_Vsweep_end(button_element) {
+    query_all_parameters()
     Detuning_Vend=Detuning
     alpha_in_Vend=alpha_in
     kappa_Vend=kappa
@@ -730,11 +752,7 @@ sweep_show_kinetic_average=false
 alpha_in=1.0 // because it will be accessed in change_kappa already
 
 // Parameters: Obtain them from sliders for the first time
-change_detuning() // obtain Detuning value
-change_kappa()
-change_gamma()
-change_g0()
-change_alpha_in()
+query_all_parameters()
 change_sweep_time()
 
 // prepare time trace
