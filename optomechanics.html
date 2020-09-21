@@ -2,7 +2,19 @@
 <title>Optomechanics in your browser</title>
 	<head>
 				<meta name="viewport" content="width=device-width, initial-scale=1">
-	</head>
+    </head>
+    <!---
+    (C) 2020 by Florian Marquardt and Tirth Shah.
+    Max Planck Institute for the Science of Light, Erlangen.
+    mpl.mpg.de (theory division)
+
+    This is an outreach project within the Marie Curie Network
+    Optomechanical Technologies, sponsored by the European Union.
+    It was written to serve as a basis for a MOOC video on
+    nonlinear dynamics in optomechanics.
+
+    MIT License. You can re-use, but please give credit.
+    -->
 <style>
 .mybutton {
 	background-color:#00AA80;
@@ -137,6 +149,9 @@ Cavity Optomechanics Simulator
         <input type="checkbox" onclick="activate_sweep2d(this)"/>
         <div>2D sweep</div>
     </label>
+
+    <p class="mybutton" onclick="show_parameter_URL()">Show parameter URL</p>
+    <p id="parameter_URL_field" style="font-size:8;word-wrap:break-word"></p>
 
 	<p style="font-size:14;color:lightseagreen">Tirth Shah & Florian Marquardt 2020<br>OMT, supported by the E.U.</p>
 </div>
@@ -319,6 +334,28 @@ function activate_sweep2d(checkboxbutton) {
     }
 }
 
+function show_parameter_URL() {
+    var field=document.getElementById("parameter_URL_field")
+    field.innerHTML=get_URL_with_parameters()
+    selectText(field)
+}
+
+function selectText(node) {
+    if (document.body.createTextRange) {
+        const range = document.body.createTextRange();
+        range.moveToElementText(node);
+        range.select();
+    } else if (window.getSelection) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else {
+        console.warn("Could not select text in node: Unsupported browser.");
+    }
+}
+
 // graphics
 
 function circle(x, y, r,color) {
@@ -477,6 +514,7 @@ function hide_canvas() {
 }
 
 function unhide_canvas() {
+    hide_sweep2d_label_boxes()
     canvas.style.display="block"
 }
 
@@ -508,6 +546,11 @@ function create_sweep2d_label_boxes() {
 
     document.body.insertBefore(sweep_label,null)
     document.body.insertBefore(sweep_V_label,null)
+}
+
+function hide_sweep2d_label_boxes() {
+    sweep_label.remove()
+    sweep_V_label.remove()
 }
 
 function canvas2d_obtain_min_max_values() {
@@ -690,6 +733,107 @@ function animate() {
     }
 }
 
+// saving parameters in URLs and loading them again
+
+function save_parameters_to_string() { // convert parameters into text string
+    args=Array.from(arguments)
+    string=""
+    for(j=0;j<args.length;j+=2) {
+        string=string+args[j]+"="+args[j+1]+";"
+    }
+    return(string)
+}
+
+function get_param(name) {
+    var patt = new RegExp(name+"=([^;]*);",'g')
+    matches=patt.exec(parameter_string)
+    if(matches) {
+        return(matches[1])
+    } else {
+        return(null)
+    }
+}
+
+function save_parameters() { // save parameters to parameter_string
+    query_all_parameters()
+    parameter_string=save_parameters_to_string("Detuning",Detuning,"kappa",kappa,"Gamma",Gamma,"g0",g0,
+    "alpha_in",alpha_in,
+    "Detuning_start",Detuning_start, "Detuning_end", Detuning_end,
+    "kappa_start", kappa_start, "kappa_end", kappa_end,
+    "Gamma_start", Gamma_start, "Gamma_end", Gamma_end,
+    "g0_start", g0_start, "g0_end", g0_end,
+    "alpha_in_start", alpha_in_start, "alpha_in_end", alpha_in_end,
+    "Detuning_Vstart",Detuning_Vstart, "Detuning_Vend", Detuning_Vend,
+    "kappa_Vstart", kappa_Vstart, "kappa_Vend", kappa_Vend,
+    "Gamma_Vstart", Gamma_Vstart, "Gamma_Vend", Gamma_Vend,
+    "g0_Vstart",   g0_Vstart, "g0_Vend", g0_Vend,
+    "alpha_in_Vstart", alpha_in_Vstart, "alpha_in_Vend", alpha_in_Vend,
+    "sweep_time",sweep_time)
+}
+
+function get_several_params() {
+    args=Array.from(arguments)
+    values=new Array(args.length)
+    for(j=0;j<args.length;j++) {
+        values[j]=parseFloat(get_param(args[j]))
+    }
+    return(values)
+}
+
+function load_parameters() { // load parameters out of the current parameter_string
+    document.getElementById('detuning_input').value=get_param("Detuning")
+    document.getElementById('kappa_input').value=get_param("kappa")
+    document.getElementById('gamma_input').value=Math.log10(get_param("Gamma"))
+    document.getElementById('g0_input').value=get_param("g0")
+    document.getElementById('alpha_in_input').value=Math.log10(Math.pow(get_param("alpha_in"),2))
+    document.getElementById('sweep_time_input').value=Math.log10(get_param(sweep_time))
+
+    p=get_several_params("Detuning_start","Detuning_end","kappa_start","kappa_end","Gamma_start",
+    "Gamma_end","g0_start","g0_end", "alpha_in_start", "alpha_in_end", "Detuning_Vstart",
+    "Detuning_Vend", "kappa_Vstart", "kappa_Vend", "Gamma_Vstart", "Gamma_Vend", "g0_Vstart",
+    "g0_Vend", "alpha_in_Vstart", "alpha_in_Vend")
+    
+    Detuning_start=p[0]
+    Detuning_end=p[1]
+    kappa_start=p[2] 
+    kappa_end=p[3]
+    Gamma_start=p[4] 
+    Gamma_end=p[5]
+    g0_start=p[6] 
+    g0_end=p[7]
+    alpha_in_start=p[8] 
+    alpha_in_end=p[9]
+    Detuning_Vstart=p[10]
+    Detuning_Vend=p[11]
+    kappa_Vstart=p[12] 
+    kappa_Vend=p[13]
+    Gamma_Vstart=p[14]
+    Gamma_Vend=p[15]
+    g0_Vstart=p[16]
+    g0_Vend=p[17]
+    alpha_in_Vstart=p[18] 
+    alpha_in_Vend=p[19]
+
+    query_all_parameters()
+    change_sweep_time()
+}
+
+function get_URL_with_parameters() {
+    leading_part=window.location.href.split("?")[0]
+    save_parameters()
+    return(leading_part+"?"+parameter_string)
+}
+
+function load_parameters_from_URL() {
+    parts=window.location.href.split("?")
+    if(parts.length>1) {
+        parameter_string=parts[1]
+        load_parameters()
+    }
+}
+
+
+
 //============ MAIN ==========
 // Setting up parameters and graphics, starting animation
 
@@ -717,7 +861,7 @@ DETUNING_TEXT="Detuning &Delta;/&Omega;"
 KAPPA_TEXT="Cavity decay &kappa;/&Omega;"
 GAMMA_TEXT="Mechanical damping &Gamma;/&Omega;"
 G0_TEXT="Coupling g<sub>0</sub>/&Omega;"
-ALPHA_TEXT="Drive amplitude &alpha;<sub>in</sub>/&Omega;<sup>1/2</sup>;"
+ALPHA_TEXT="Drive amplitude &alpha;<sub>in</sub>/&Omega;<sup>1/2</sup>"
 
 TIMETRACE_X0=10
 TIMETRACE_Y0=50
@@ -751,9 +895,37 @@ sweep2d_active=false
 sweep_show_kinetic_average=false
 alpha_in=1.0 // because it will be accessed in change_kappa already
 
+// sweep parameters (such that they are defined even in the beginning)
+// note: the way this works is that *only those parameters where start and end differ* will
+// define the sweep. This is true both for the horizontal and the vertical ('V') sweep.
+Detuning_start=-2
+Detuning_end=2
+kappa_start=1
+kappa_end=1
+Gamma_start=0.1
+Gamma_end=0.1
+g0_start=0.0001
+g0_end=0.0001
+alpha_in_start=10
+alpha_in_end=10
+Detuning_Vstart=0
+Detuning_Vend=0
+kappa_Vstart=1
+kappa_Vend=1
+Gamma_Vstart=0.1
+Gamma_Vend=0.1
+g0_Vstart=0.0001
+g0_Vend=0.0001
+alpha_in_Vstart=1
+alpha_in_Vend=1e3
+
+
 // Parameters: Obtain them from sliders for the first time
 query_all_parameters()
 change_sweep_time()
+
+// now check whether maybe we have parameters sitting in the URL and use them instead!
+load_parameters_from_URL()
 
 // prepare time trace
 X_record=new Array(max_time_idx)
