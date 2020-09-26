@@ -153,7 +153,7 @@ Cavity Optomechanics Simulator
     <p class="mybutton" onclick="show_parameter_URL()">Show parameter URL</p>
     <p id="parameter_URL_field" style="font-size:8;word-wrap:break-word"></p>
 
-	<p style="font-size:14;color:lightseagreen">Tirth Shah & Florian Marquardt 2020<br>OMT, supported by the E.U.</p>
+	<p style="font-size:14;color:lightseagreen">Tirth Shah & Florian Marquardt 2020<br>Marie-Curie network "Optomechanical Technologies", supported by the European Union</p>
 </div>
 
 <script>
@@ -302,10 +302,22 @@ function activate_sweep(checkboxbutton) {
         }
     } else {
         sweep_active=false
-        canvas2d.remove()
-        canvas2d=null
-        unhide_canvas()
+        if(sweep2d_active) {
+            canvas2d.remove()
+            canvas2d=null
+            unhide_canvas()
+        }
+        reset_X_alpha_records()
+        change_X_alpha2_plot_labels(PLOT_LABEL_VS_TIME)
     }
+}
+
+function reset_X_alpha_records() {
+    for(var j=0;j<max_time_idx;j++) {
+        X_record[j]=0.0
+        alpha2_record[j]=0.0
+    }
+
 }
 
 function switch_kinetic_average(checkboxbutton) {
@@ -382,6 +394,13 @@ function add_graphics() {
     return shape
 }
 
+function add_graphics_no_canvas() {
+    args=Array.from(arguments)
+    var shape = document.createElementNS("http://www.w3.org/2000/svg", args[0])
+    setAttributes(shape,args)
+    return shape
+}
+
 function HTMLObject(x,y,width,height,htmlcode,textstyle) {
     var fo= document.createElementNS ('http://www.w3.org/2000/svg', 'foreignObject')
     fo.setAttribute("x",x)
@@ -396,43 +415,66 @@ function HTMLObject(x,y,width,height,htmlcode,textstyle) {
     return(fo)
 }
 
-function plot(x,y,x0,y0,width,height,color,linewidth,existing_shape) {
-    var string,X,Y
-    var j,N=x.length
+class Plot {
+    constructor(x0,y0,width,height,color,linewidth,fillcolor,bordercolor,borderwidth) {
+        this.x0=x0
+        this.y0=y0
+        this.width=width
+        this.height=height
+        this.color=color
+        this.linewidth=linewidth
+        this.shape=null
 
-    var maxy=Math.max(...y)
-    var miny=Math.min(...y)
-    var maxx=Math.max(...x)
-    var minx=Math.min(...x)
-    if(maxx-minx<1e-3) { maxx=minx+1e-3 }
-    if(maxy-miny<1e-3) { maxy=miny+1e-3 }
-    var sy=height/(maxy-miny)
-    var sx=width/(maxx-minx)
-    y0-=miny*sy
-    x0-=minx*sx
+        this.background_shape=add_graphics("rect","x",x0,"y",y0-height,"width",width,"height",height,
+        "fill",fillcolor,"stroke",bordercolor,"stroke-width",borderwidth)
 
-    for(j=0;j<N;j++) {
-        X=x[j]
-        Y=y[j]
-        if(j==0) {
-            string=X+","+Y
-        } else {
-            string+=" "+X+","+Y
+        this.ticks_horizontal=new TickMarks(y0,TICKMARKS_LENGTH,TICKMARKS_COLOR,TICKMARKS_LINEWIDTH,true)
+        this.ticks_vertical=new TickMarks(x0,TICKMARKS_LENGTH,TICKMARKS_COLOR,TICKMARKS_LINEWIDTH,false)
+    }
+
+    draw(x,y) {
+        var string,X,Y
+        var j,N=x.length
+
+        var maxy=Math.max(...y)
+        var miny=Math.min(...y)
+        var maxx=Math.max(...x)
+        var minx=Math.min(...x)
+        if(maxx-minx<1e-6) { maxx=minx+1e-6 }
+        if(maxy-miny<1e-6) { maxy=miny+1e-6 }
+        this.sy=-this.height/(maxy-miny)
+        this.sx=this.width/(maxx-minx)
+        this.yshift=this.y0-miny*this.sy
+        this.xshift=this.x0-minx*this.sx
+
+        for(j=0;j<N;j++) {
+            X=x[j]
+            Y=y[j]
+            if(j==0) {
+                string=X+","+Y
+            } else {
+                string+=" "+X+","+Y
+            }
         }
-    }
 
-    if(existing_shape!=null) {
-        existing_shape.setAttribute("points",string)
-        existing_shape.setAttribute("transform","translate("+x0+","+y0+") scale("+sx+","+sy+")")
-    } else {
-        return(add_graphics("polyline","points",string,"stroke",color,"stroke-width",
-        linewidth, "stroke-linejoin", "round", "vector-effect","non-scaling-stroke",
-        "fill","none","transform","translate("+x0+","+y0+") scale("+sx+","+sy+")"))
-    }
-}
+        this.transform="translate("+this.xshift+","+this.yshift+") scale("+this.sx+","+this.sy+")"
+        if(this.shape!=null) {
+            this.shape.setAttribute("points",string)
+            this.shape.setAttribute("transform",this.transform)
+        } else {
+            this.shape=add_graphics("polyline","points",string,"stroke",this.color,"stroke-width",
+            this.linewidth, "stroke-linejoin", "round", "vector-effect","non-scaling-stroke",
+            "fill","none","transform",this.transform)
+        }
 
-function plot_background(x0,y0,width,height,fillcolor,bordercolor,borderwidth) {
-    return(add_graphics("rect","x",x0,"y",y0,"width",width,"height",height,"fill",fillcolor,"stroke",bordercolor,"stroke-width",borderwidth))
+        this.ticks_horizontal.scale=this.sx
+        this.ticks_horizontal.xshift=this.xshift
+        this.ticks_horizontal.set_values_from_range(minx,maxx)
+
+        this.ticks_vertical.scale=this.sy
+        this.ticks_vertical.xshift=this.yshift
+        this.ticks_vertical.set_values_from_range(miny,maxy)
+    }
 }
 
 // routines for the 2d image (2d sweep)
@@ -474,6 +516,109 @@ function canvas2d_draw_img() { // draw the img contained inside red,green,blue
     canvas2d_ctx.putImageData(canvas2d_img,0,0)
 }
 
+class TickMarks {
+    constructor(y0,dy,color,linewidth,horizontal) {
+        this.y0=y0
+        this.dy=dy
+        this.color=color
+        this.linewidth=linewidth
+        this.horizontal=horizontal
+        this.shape=null
+        this.labels_style="font-size:2;fill:white;font-family:Helvetica;font-weight:100"
+        if(horizontal) {
+            this.text_offset=3 
+            this.text_extra_offset=0
+        } else {
+            this.text_offset=-7
+            this.text_extra_offset=-3
+        }
+        this.scale=1
+        this.xshift=0
+        this.xmin=-1e12
+        this.xmax=-1e12
+    }
+
+    set_values(xvalues) {
+        this.xvalues=xvalues
+        this.draw()
+    }
+
+    set_values_from_range(xmin,xmax) {
+        if(xmin==this.xmin && xmax==this.xmax) { 
+            return // do not redraw unnecessarily
+        } else { 
+            this.xmin=xmin
+            this.xmax=xmax
+        }
+        var xstep=Math.pow(10,Math.ceil(Math.log10(xmax-xmin))-1)
+        
+        this.xvalues=[]
+        if((xmax-xmin)/xstep>4) {
+            xstep*=2
+        } else {
+            if((xmax-xmin)/xstep<2) {
+                xstep/=2
+            }
+        }
+        for(var X=Math.ceil(xmin/xstep)*xstep;X<=xmax;X+=xstep) {
+            this.xvalues.push(X)
+        }
+        this.draw()
+    }
+
+    draw_labels() {
+        var n=this.xvalues.length
+
+        if(this.labels_shape!=null) {
+            this.labels_shape.remove()
+        }
+
+        this.labels_shape=add_graphics_no_canvas("g")
+
+        if(this.horizontal) { var x_arg="x"; var y_arg="y"; } else { var x_arg="y"; var y_arg="x"; }
+
+        var offset=this.text_offset
+        // get extra text offset in case there will be "1.5e+3" or similar
+        if(Math.abs(this.xmax)<1e-3 || Math.abs(this.xmin)<1e-3) { offset+=this.text_extra_offset }
+        if(Math.abs(this.xmax)>1e3 || Math.abs(this.xmin)>1e3) { offset+=this.text_extra_offset }
+
+        for(var j=0;j<n;j++) {
+            var txt=add_graphics_no_canvas("text",x_arg,(this.xvalues[j]*this.scale+this.xshift),
+                y_arg,this.y0+offset,"style",this.labels_style,"vector-effect","non-scaling-size")
+            txt.innerHTML=this.xvalues[j].toPrecision(3)
+            this.labels_shape.appendChild(txt)
+        }
+    }
+
+    draw() {
+        var path_string
+        var n=this.xvalues.length, path_string=""
+
+        // TICKS
+        if(this.horizontal) {
+            for(var j=0;j<n;j++) {
+                path_string+=" M "+(this.xvalues[j]*this.scale+this.xshift)+" "+this.y0+" v "+this.dy
+            }
+        } else {
+            for(var j=0;j<n;j++) {
+                path_string+=" M "+this.y0+" "+(this.xvalues[j]*this.scale+this.xshift)+" h "+(-this.dy)
+            }
+        }
+
+        if(this.shape==null) {
+            this.shape=add_graphics_no_canvas("path","d",path_string,"stroke",this.color,
+            "stroke-width",this.linewidth)
+            canvas.appendChild(this.shape)
+        } else { // only update, object already exists:
+            this.shape.setAttribute("d",path_string)
+        }
+
+        // LABELS
+        this.draw_labels()
+        canvas.appendChild(this.labels_shape)
+    }
+}
+
 // Runge Kutta and animation
 
 function rhs(Y) {
@@ -502,11 +647,14 @@ function rkstep() {
     }
 }
 
-function plot_X_and_alpha2() { // update both plot panels
-    plot(times_record,X_record,TIMETRACE_X0,TIMETRACE_Y0,TIMETRACE_XWIDTH,
-        TIMETRACE_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,shape_timetrace)
-    plot(times_record,alpha2_record,TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0,TIMETRACE_ALPHA2_XWIDTH,
-        TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,shape_alpha2_timetrace)
+function plot_X_and_alpha2(horiz_values) { // update both plot panels
+    shape_timetrace.draw(horiz_values,X_record)
+    shape_alpha2_timetrace.draw(horiz_values,alpha2_record)
+}
+
+function change_X_alpha2_plot_labels(label_vs_what) {
+    shape_timetrace_label.children[0].innerHTML=PLOT_LABEL_BEGIN+X_PLOT_LABEL+label_vs_what+PLOT_LABEL_END
+    shape_alpha2_timetrace_label.children[0].innerHTML=PLOT_LABEL_BEGIN+ALPHA_PLOT_LABEL+label_vs_what+PLOT_LABEL_END
 }
 
 function hide_canvas() {
@@ -585,11 +733,10 @@ function plot_sweep_batch(start,stop) {
 }
 
 function do_sweep(v_idx) {
-    time_idx=0
-
-    tmax=max_time_idx*DT
-
-    var SMALL_NUMBER=1e-10
+    var sweep_label_text
+    var time_idx=0
+    var tmax=max_time_idx*DT
+    const SMALL_NUMBER=1e-10
     
     // check which parameters are really swept for the normal sweep
     if(Math.abs(Detuning_end-Detuning_start)<SMALL_NUMBER) { Detuning_sweep=false } else { Detuning_sweep=true }
@@ -642,8 +789,13 @@ function do_sweep(v_idx) {
             if(Gamma_Vsweep) { sweep_V_label.innerHTML=GAMMA_TEXT+" ("+Gamma_Vstart.toPrecision(3)+"..."+Gamma_Vend.toPrecision(3)+")" }
             if(g0_Vsweep) { sweep_V_label.innerHTML=G0_TEXT+" ("+g0_Vstart.toPrecision(3)+"..."+g0_Vend.toPrecision(3)+")" }
         }
-    } else {
+    } else { // just a 1d sweep
         max_V_idx=1
+        if(Detuning_sweep) { sweep_label_text=DETUNING_TEXT }
+        if(alpha_in_sweep) { sweep_label_text=ALPHA_TEXT }
+        if(kappa_sweep) { sweep_label_text=KAPPA_TEXT }
+        if(Gamma_sweep) { sweep_label_text=GAMMA_TEXT }
+        if(g0_sweep) { sweep_label_text=G0_TEXT }
     }
 
     if(sweep2d_active) {
@@ -663,14 +815,16 @@ function do_sweep(v_idx) {
     var t=0.0
     var t_step=0.0
 
+    var sweep_values=new Array(max_time_idx)
+
     // do sweep (change parameters while evolving in time)
     for(time_idx=0;time_idx<max_time_idx;time_idx++) {
         s=time_idx*DT/tmax
-        if(Detuning_sweep) { Detuning=(1-s)*Detuning_start+s*Detuning_end }
-        if(alpha_in_sweep) { alpha_in=(1-s)*alpha_in_start+s*alpha_in_end }
-        if(kappa_sweep) { kappa=(1-s)*kappa_start+s*kappa_end }
-        if(Gamma_sweep) { Gamma=(1-s)*Gamma_start+s*Gamma_end }
-        if(g0_sweep) { g0=(1-s)*g0_start+s*g0_end }
+        if(Detuning_sweep) { Detuning=sweep_value=(1-s)*Detuning_start+s*Detuning_end }
+        if(alpha_in_sweep) { alpha_in=sweep_value=(1-s)*alpha_in_start+s*alpha_in_end }
+        if(kappa_sweep) { kappa=sweep_value=(1-s)*kappa_start+s*kappa_end }
+        if(Gamma_sweep) { Gamma=sweep_value=(1-s)*Gamma_start+s*Gamma_end }
+        if(g0_sweep) { g0=sweep_value=(1-s)*g0_start+s*g0_end }
         LaserDrive=Math.sqrt(kappa)*alpha_in
 
         t_step=t_step+DT_big_step
@@ -687,6 +841,8 @@ function do_sweep(v_idx) {
             X_record[time_idx]=X[0]
         }
         alpha2_record[time_idx]=X[2]*X[2]+X[3]*X[3]
+
+        sweep_values[time_idx]=sweep_value
     }
 
     if(sweep2d_active) {
@@ -697,7 +853,8 @@ function do_sweep(v_idx) {
             plot_sweep_batch(v_idx-canvas2d_batch+1,v_idx)
         }
     } else {
-        plot_X_and_alpha2()
+        plot_X_and_alpha2(sweep_values)
+        change_X_alpha2_plot_labels(" vs "+sweep_label_text)
     }
 }
 
@@ -717,7 +874,7 @@ function animate() {
         if(MASSPOINT_ENABLED) {
             shape_mass_point.setAttribute("cx",MASSPOINT_X0+MASSPOINT_XSCALE*X[0])
         }
-        plot_X_and_alpha2()
+        plot_X_and_alpha2(times_record)
     } else {
         if(sweep2d_active) {
             if(V_idx<max_V_sweep_idx) {
@@ -853,9 +1010,10 @@ PLOT_LABEL_HEIGHT=5
 PLOT_LABEL_SHIFT=-6
 PLOT_LABEL_BACKGROUND_COLOR="orange"
 PLOT_LABEL_TEXT_COLOR="white"
-PLOT_LABEL_BEGIN="<p style='margin:auto;background-color:rgba(0,150,200,0.8);width:30%;padding:1px;border-radius:2px'>"
+PLOT_LABEL_BEGIN="<p style='margin:auto;background-color:rgba(0,150,200,0.8);display:inline-block;padding:1px;border-radius:2px'>"
 PLOT_LABEL_END="</p>"
 PLOT_LABEL_TEXT_STYLE="font-size:2;font-family:Helvetica;font-weight:100;color:white"
+
 
 DETUNING_TEXT="Detuning &Delta;/&Omega;"
 KAPPA_TEXT="Cavity decay &kappa;/&Omega;"
@@ -863,22 +1021,31 @@ GAMMA_TEXT="Mechanical damping &Gamma;/&Omega;"
 G0_TEXT="Coupling g<sub>0</sub>/&Omega;"
 ALPHA_TEXT="Drive amplitude &alpha;<sub>in</sub>/&Omega;<sup>1/2</sup>"
 
-TIMETRACE_X0=10
+TIMETRACE_X0=15
 TIMETRACE_Y0=50
 TIMETRACE_XWIDTH=80
-TIMETRACE_YWIDTH=-10
+TIMETRACE_YWIDTH=10
+X_PLOT_LABEL="Position x/x<sub>ZPF</sub>"
 
 TIMETRACE_ALPHA2_Y0=25
-TIMETRACE_ALPHA2_X0=10
-TIMETRACE_ALPHA2_YWIDTH=-10
+TIMETRACE_ALPHA2_X0=15
+TIMETRACE_ALPHA2_YWIDTH=10
 TIMETRACE_ALPHA2_XWIDTH=80
+ALPHA_PLOT_LABEL="Intensity |&alpha;|<sup>2</sup>"
+
+PLOT_LABEL_VS_TIME=" vs time &Omega;t"
+
+TICKMARKS_LENGTH=1
+TICKMARKS_COLOR="white"
+TICKMARKS_LINEWIDTH=0.2
+
 
 // Numerics parameters
 DT=0.2
 DT6=DT/6.0
 
 // parameters for display
-max_time_idx=1000 // how many points to store for displaying the time trace
+max_time_idx=1001 // how many points to store for displaying the time trace
 max_V_sweep_idx=600
 canvas2d=null
 canvas2d_batch=10 // how many lines to display simultaneously in 2d sweep
@@ -943,20 +1110,25 @@ canvas=document.getElementById("canvas")
 if(MASSPOINT_ENABLED) {
     shape_mass_point=circle(MASSPOINT_X0+MASSPOINT_XSCALE*X[0],MASSPOINT_Y0,MASSPOINT_RADIUS,"orange")
 }
-// plot of time trace (curve will be modified later)
-shape_timetrace_background=plot_background(TIMETRACE_X0,TIMETRACE_Y0+TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_XWIDTH,-TIMETRACE_YWIDTH,
-PLOT_BACKGROUND_COLOR,PLOT_BORDER_COLOR,PLOT_BORDER_WIDTH)
-shape_timetrace=plot(times_record,X_record,TIMETRACE_X0,TIMETRACE_Y0,TIMETRACE_XWIDTH,
-    TIMETRACE_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,null)
-shape_timetrace_label=HTMLObject(TIMETRACE_X0,TIMETRACE_Y0+TIMETRACE_ALPHA2_YWIDTH+PLOT_LABEL_SHIFT,TIMETRACE_XWIDTH,
-PLOT_LABEL_HEIGHT,PLOT_LABEL_BEGIN+"Position x/x<sub>ZPF</sub>"+PLOT_LABEL_END,PLOT_LABEL_TEXT_STYLE)
 
-shape_alpha2_timetrace_background=plot_background(TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0+TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_ALPHA2_XWIDTH,
-    -TIMETRACE_ALPHA2_YWIDTH,PLOT_BACKGROUND_COLOR,PLOT_BORDER_COLOR,PLOT_BORDER_WIDTH)
-shape_alpha2_timetrace=plot(times_record,alpha2_record,TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0,TIMETRACE_ALPHA2_XWIDTH,
-    TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,null)
-shape_alpha2_timetrace_label=HTMLObject(TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0+TIMETRACE_ALPHA2_YWIDTH+PLOT_LABEL_SHIFT,TIMETRACE_ALPHA2_XWIDTH,
-PLOT_LABEL_HEIGHT,PLOT_LABEL_BEGIN+"Intensity |&alpha;|<sup>2</sup>"+PLOT_LABEL_END,PLOT_LABEL_TEXT_STYLE)
+// plot of time trace (curve will be modified later)
+shape_timetrace=new Plot(TIMETRACE_X0,TIMETRACE_Y0,TIMETRACE_XWIDTH,
+    TIMETRACE_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,
+    PLOT_BACKGROUND_COLOR,PLOT_BORDER_COLOR,PLOT_BORDER_WIDTH)
+shape_timetrace.draw(times_record,X_record)
+
+shape_timetrace_label=HTMLObject(TIMETRACE_X0,TIMETRACE_Y0-TIMETRACE_ALPHA2_YWIDTH+PLOT_LABEL_SHIFT,TIMETRACE_XWIDTH,
+PLOT_LABEL_HEIGHT,PLOT_LABEL_BEGIN+X_PLOT_LABEL+PLOT_LABEL_VS_TIME+PLOT_LABEL_END,PLOT_LABEL_TEXT_STYLE)
+shape_timetrace_label.children[0].style.textAlign="center"
+
+shape_alpha2_timetrace=new Plot(TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0,TIMETRACE_ALPHA2_XWIDTH,
+    TIMETRACE_ALPHA2_YWIDTH,TIMETRACE_COLOR,TIMETRACE_LINEWIDTH,
+    PLOT_BACKGROUND_COLOR,PLOT_BORDER_COLOR,PLOT_BORDER_WIDTH)
+shape_alpha2_timetrace.draw(times_record,alpha2_record)
+
+shape_alpha2_timetrace_label=HTMLObject(TIMETRACE_ALPHA2_X0,TIMETRACE_ALPHA2_Y0-TIMETRACE_ALPHA2_YWIDTH+PLOT_LABEL_SHIFT,TIMETRACE_ALPHA2_XWIDTH,
+PLOT_LABEL_HEIGHT,PLOT_LABEL_BEGIN+ALPHA_PLOT_LABEL+PLOT_LABEL_VS_TIME+PLOT_LABEL_END,PLOT_LABEL_TEXT_STYLE)
+shape_alpha2_timetrace_label.children[0].style.textAlign="center"
 
 
 // Start animation loop
