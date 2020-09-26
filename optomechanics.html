@@ -144,6 +144,7 @@ Cavity Optomechanics Simulator
             </datalist>
     </div>
 
+    <p class="mybutton" onclick="if(simulation_paused) { simulation_paused=false; this.innerHTML='Pause simulation';} else { simulation_paused=true; this.innerHTML='Continue simulation'; } ">Pause simulation</p>
     <p class="collapsible-button" onclick="var content = this.nextElementSibling; if (content.style.display === 'block') { content.style.display = 'none';       } else {        content.style.display = 'block';        }">Parameter sweeps ... </button>
     <div class="collapsible-content">
 
@@ -908,7 +909,7 @@ function do_sweep(v_idx) {
 }
 
 function animate() {
-    if(!sweep_active) { // if we are not currently in sweeping mode
+    if(!sweep_active && !simulation_paused) { // if we are not currently in sweeping mode or paused
         rkstep()
 
         // keep records of time traces
@@ -1071,14 +1072,14 @@ G0_TEXT="Coupling g<sub>0</sub>/&Omega;"
 ALPHA_TEXT="Drive amplitude &alpha;<sub>in</sub>/&Omega;<sup>1/2</sup>"
 
 TIMETRACE_X0=15
-TIMETRACE_Y0=50
+TIMETRACE_Y0=60
 TIMETRACE_XWIDTH=80
-TIMETRACE_YWIDTH=10
+TIMETRACE_YWIDTH=17
 X_PLOT_LABEL="Position x/x<sub>ZPF</sub>"
 
 TIMETRACE_ALPHA2_Y0=25
 TIMETRACE_ALPHA2_X0=15
-TIMETRACE_ALPHA2_YWIDTH=10
+TIMETRACE_ALPHA2_YWIDTH=17
 TIMETRACE_ALPHA2_XWIDTH=80
 ALPHA_PLOT_LABEL="Intensity |&alpha;|<sup>2</sup>"
 
@@ -1106,6 +1107,7 @@ Xnew=Array(X.length)
 
 kinetic_amplitude_averaging_time=30.0 // about 5 oscillation periods
 
+simulation_paused=false
 sweep_active=false // whether we are in sweeping mode
 sweep2d_active=false
 sweep_show_kinetic_average=false
