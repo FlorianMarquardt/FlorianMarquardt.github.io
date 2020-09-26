@@ -29,10 +29,35 @@
 	background-color:#FF8000;
     cursor:pointer
 }
+
 .mybutton_animation {
     animation: 0.2s linear 0s 1 normal sweep_color;
 }
+
 @keyframes sweep_color { from { background-color:rgb(255,255,255); } to { background-color:rgb(255,200,0); } } 
+
+.collapsible-button {
+    background-color:gray ;
+    padding: 5px;
+    border-radius: 5px;
+    font-family:Helvetica;
+    font-weight:100;
+    margin:auto;
+    margin-bottom:2px;
+    cursor:pointer;
+}
+
+.collapsible-button:hover {
+    background-color:lightgray;
+}
+
+.collapsible-content {
+  display: none;
+  overflow: hidden;
+  background-color:gray;
+  padding: 5px;
+  border-radius: 5px;
+}
 </style>
 
 <body style="margin:0; background-color:#000000">
@@ -51,15 +76,15 @@ Scripts are at the end of this page!
 And now: the text!
 --->
 
-<div id="sidebar" style="float:left;max-width:24%;background-color:dimgrey;font-family:Helvetica;font-weight:100;color:#FFFFFF;padding:10px">
+<div id="sidebar" style="float:right;max-width:25%;background-color:dimgrey;font-family:Helvetica;font-weight:100;color:#FFFFFF;padding:10px">
 
-	<p style="font-size:24px;font-weight:800;background-color:orange;padding:5px;border-radius:5px">
+	<p style="font-size:20px;font-weight:100;background-color:orange;padding:5px;border-radius:5px">
 Cavity Optomechanics Simulator
 	</p>
 
 	<div id="detuning_input_div" class="slider">
 	<label>Detuning &Delta;/&Omega;=</label> <label id="detuning_text">1</label>
-    <input id="detuning_input" style="width:100%" type="range" list="tickmarks" min="-3" max="3" value="1" step="0.01" oninput="change_detuning(true)">
+    <input id="detuning_input" style="width:100%" type="range" list="tickmarks" min="-5" max="5" value="1" step="0.01" oninput="change_detuning(true)">
     <datalist id="tickmarks">
         <option value="0" label="0"></option>
         <option value="1" label="1"></option>
@@ -119,6 +144,9 @@ Cavity Optomechanics Simulator
             </datalist>
     </div>
 
+    <p class="collapsible-button" onclick="var content = this.nextElementSibling; if (content.style.display === 'block') { content.style.display = 'none';       } else {        content.style.display = 'block';        }">Parameter sweeps ... </button>
+    <div class="collapsible-content">
+
     <p class="mybutton" onclick="define_sweep_start(this)">Set sweep start</p>
     <p class="mybutton" onclick="define_sweep_end(this)">Set sweep end</p>
     <div id="sweep_time_input_div" class="slider">
@@ -132,6 +160,7 @@ Cavity Optomechanics Simulator
             <option value="5" label="1e5"></option>
             </datalist>
     </div>
+
 
     <label>
     <input type="checkbox" onclick="activate_sweep(this)"/>
@@ -149,15 +178,29 @@ Cavity Optomechanics Simulator
         <input type="checkbox" onclick="activate_sweep2d(this)"/>
         <div>2D sweep</div>
     </label>
+    </div>
 
     <p class="mybutton" onclick="show_parameter_URL()">Show parameter URL</p>
     <p id="parameter_URL_field" style="font-size:8;word-wrap:break-word"></p>
 
-	<p style="font-size:14;color:lightseagreen">Tirth Shah & Florian Marquardt 2020<br>Marie-Curie network "Optomechanical Technologies", supported by the European Union</p>
+    <p style="font-size:14;color:white">Tirth Shah & Florian Marquardt 2020<br>
+        <a href="https://mpl.mpg.de/divisions/marquardt-division/" target="_new" style="color:white">Max Planck Institute for the Science of Light</a><br>
+        Marie-Curie network<br>
+        "Optomechanical Technologies", <br>
+        supported by the European Union
+        <!-- European flag from Wikimedia Commons -->
+        <svg width="24.30" height="16" viewBox="0 0 810 540"><desc>European flag</desc>
+            <defs><g id="s"><g id="c"><path id="t" d="M0,0v1h0.5z" transform="translate(0,-1)rotate(18)"/><use xlink:href="#t" transform="scale(-1,1)"/></g><g id="a"><use xlink:href="#c" transform="rotate(72)"/><use xlink:href="#c" transform="rotate(144)"/></g><use xlink:href="#a" transform="scale(-1,1)"/></g></defs>
+            <rect fill="#039" width="810" height="540"/><g fill="#fc0" transform="scale(30)translate(13.5,9)"><use xlink:href="#s" y="-6"/><use xlink:href="#s" y="6"/><g id="l"><use xlink:href="#s" x="-6"/><use xlink:href="#s" transform="rotate(150)translate(0,6)rotate(66)"/><use xlink:href="#s" transform="rotate(120)translate(0,6)rotate(24)"/><use xlink:href="#s" transform="rotate(60)translate(0,6)rotate(12)"/><use xlink:href="#s" transform="rotate(30)translate(0,6)rotate(42)"/></g><use xlink:href="#l" transform="scale(-1,1)"/></g>
+        </svg>
+    </p>
+
 </div>
 
 <script>
 // User interface actions
+
+
 function change_detuning(also_sweep) {
     Detuning=parseFloat(document.getElementById('detuning_input').value)
     document.getElementById('detuning_text').innerHTML=Detuning
@@ -553,11 +596,17 @@ class TickMarks {
         var xstep=Math.pow(10,Math.ceil(Math.log10(xmax-xmin))-1)
         
         this.xvalues=[]
-        if((xmax-xmin)/xstep>4) {
+        if((xmax-xmin)/xstep>6) {
             xstep*=2
         } else {
-            if((xmax-xmin)/xstep<2) {
-                xstep/=2
+            if(this.horizontal) {
+                if((xmax-xmin)/xstep<=3) {
+                    xstep/=2
+                }                
+            } else {
+                if((xmax-xmin)/xstep<2) {
+                    xstep/=2
+                }
             }
         }
         for(var X=Math.ceil(xmin/xstep)*xstep;X<=xmax;X+=xstep) {
@@ -681,7 +730,7 @@ function create_sweep2d_label_boxes() {
 
     sweep_V_label=document.createElement("p")
     sweep_V_label.style.position="absolute"
-    sweep_V_label.style.left="-120px"
+    sweep_V_label.style.left="-80px"
     sweep_V_label.style.top="200px"
     sweep_V_label.style.fontFamily="Helvetica"
     sweep_V_label.style.fontSize="20px"
@@ -1006,7 +1055,7 @@ TIMETRACE_LINEWIDTH=2
 PLOT_BACKGROUND_COLOR="dimgrey"
 PLOT_BORDER_COLOR="white"
 PLOT_BORDER_WIDTH=0.2
-PLOT_LABEL_HEIGHT=5
+PLOT_LABEL_HEIGHT=6
 PLOT_LABEL_SHIFT=-6
 PLOT_LABEL_BACKGROUND_COLOR="orange"
 PLOT_LABEL_TEXT_COLOR="white"
