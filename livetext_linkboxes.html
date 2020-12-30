@@ -85,7 +85,8 @@ Code by Florian Marquardt, 2020.
                 }
                 objects=new Array() // empty array of objects
                 // regexp pattern for the (text|x|y|color) strings:
-                var patt = /\[([^\]]+)\]\(([^\)]*)\)<!--([^|]+)\|([^|]+)\|([^-]+)--\>(\n[^\[\n]+)?/g
+                var patt = /\[([^\]]*)\]\(([^\)]*)\)\<\!\-\-([^\|]+)\|([^\|]+)\|([^\-]+)\-\-\>(\n[^\[\n]+)?/g
+                var subpatt = /([0-9\.]+)\|([0-9\.]+)\|(.*)/g
                 // go through all matches and create objects
                 do {
                     matches=patt.exec(txt)
@@ -97,13 +98,23 @@ Code by Florian Marquardt, 2020.
                             x=parseFloat(matches[3])
                             y=parseFloat(matches[4])
                             colorstr=matches[5]
+                            colormatch=subpatt.exec(colorstr)
+                            if(colormatch) {
+                                colorstr=colormatch[3]
+                                width=parseFloat(colormatch[1])
+                                height=parseFloat(colormatch[2])
+                            } else {
+                                width=null
+                                height=null
+                            }
                             if(matches.length>=7) {
                                 panel_text=matches[6]
                             } else {
                                 panel_text=null
                             }
+
                             if(!isNaN(x) && !isNaN(y)) {
-                                var obj=rubberbox(x,y,textstr,colorstr,"white","font-family:\"Arial Black\";font-size:12",linkstr,"This would be a little abstract.")
+                                var obj=rubberbox(x,y,textstr,colorstr,"white","font-family:\"Arial Black\";font-size:12",linkstr,width,height)
                                 // attach event listeners to the rectangle (not the group, which does not work)
                                 the_rect=obj.childNodes[0]
                                 the_rect.addEventListener("mouseenter",mouseEnter)
@@ -122,6 +133,8 @@ Code by Florian Marquardt, 2020.
                                 obj.text_str=textstr
                                 obj.link_str=linkstr
                                 obj.panel_text=panel_text // get rid of leading \n
+                                obj.official_width=width
+                                obj.official_height=height
                                 // the official coordinates:
                                 obj.official_x=x
                                 obj.official_y=y
@@ -150,7 +163,12 @@ Code by Florian Marquardt, 2020.
                 } else {
                     var the_panel_text=obj.panel_text
                 }
-                new_obj_text="["+obj.text_str+"]("+obj.link_str+")<!--"+Math.round(obj.official_x)+"|"+Math.round(obj.official_y)+"|"+obj.color_str+"-->"+the_panel_text
+                if(obj.official_width) {
+                    var the_color_text=obj.official_width+"|"+obj.official_height+"|"+obj.color_str
+                } else {
+                    var the_color_text=obj.color_str
+                }
+                new_obj_text="["+obj.text_str+"]("+obj.link_str+")<!--"+Math.round(obj.official_x)+"|"+Math.round(obj.official_y)+"|"+the_color_text+"-->"+the_panel_text
                 // update the text area:
                 txt=replace_string(txt,obj.text_start,obj.text_end,new_obj_text)
                 txt_field.value=txt
@@ -165,7 +183,7 @@ Code by Florian Marquardt, 2020.
                 }
             }
 
-            function rubberbox(x,y,string,rectcolor,textcolor,textstyle,link,linktitle) {
+            function rubberbox(x,y,string,rectcolor,textcolor,textstyle,link,width,height) {
                 canvas=document.getElementById("canvas")
                 var group=document.createElementNS ('http://www.w3.org/2000/svg', 'g')
                 var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
@@ -177,9 +195,6 @@ Code by Florian Marquardt, 2020.
                     var linkbox= document.createElementNS ('http://www.w3.org/2000/svg', 'a')
                     linkbox.setAttributeNS('http://www.w3.org/1999/xlink', "xlink:href", link)
                     linkbox.setAttribute("target","_blank")
-                    if(linktitle.length>0) {
-                        linkbox.setAttribute("title",linktitle)
-                    }
                 }
                 var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
                 text.setAttribute("x",x)
@@ -196,10 +211,17 @@ Code by Florian Marquardt, 2020.
                 }
                 canvas.appendChild(group)
                 bbox=text.getBBox()
-                rect.setAttribute("width",bbox.width+1.0*bbox.height)
-                rect.setAttribute("height",1.5*bbox.height)
-                rect.setAttribute("x",x-0.5*bbox.height)
-                rect.setAttribute("y",y-1.0*bbox.height)
+                if(width) {
+                    rect.setAttribute("width",width)
+                    rect.setAttribute("height",height)
+                    rect.setAttribute("x",x-0.5*width+0.5*bbox.width)
+                    rect.setAttribute("y",y-1.0*bbox.height)
+                } else {
+                    rect.setAttribute("width",bbox.width+1.0*bbox.height)
+                    rect.setAttribute("height",1.5*bbox.height)
+                    rect.setAttribute("x",x-0.5*bbox.height)
+                    rect.setAttribute("y",y-1.0*bbox.height)
+                }
                 return(group)
             }
 
@@ -377,7 +399,7 @@ Code by Florian Marquardt, 2020.
                     panel=add_element("div","class","vertical-center")
                     panel.setAttribute("pointer-events","none")
 
-                    panel.style="position:absolute;width:400px;margin-left:auto;margin-right:auto;left:0;right:0;color:white;background-color:rgba(0,0,0,0.7);font-family:Helvetica;font-weight:100;font-size:1.5em;border-radius:5px;padding:10px"
+                    panel.style="pointer-events:none; position:absolute;width:400px;margin-left:auto;margin-right:auto;left:0;right:0;color:white;background-color:rgba(0,0,0,0.7);font-family:Helvetica;font-weight:100;font-size:1.5em;border-radius:5px;padding:10px"
                     panel.innerHTML="<b>"+panel_title+"</b><br><p style='color: white; width:400px; max-width:400px; height:400px'>"+panel_text+"</p>\n"
                 }
             }
