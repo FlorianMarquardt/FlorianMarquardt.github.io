@@ -12,15 +12,48 @@
     -ms-user-select: none;
     user-select: none;
     }
+
+    .vertical-center {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        }
+
+/* from https://stackoverflow.com/questions/46384057/how-to-display-a-tooltip-div-when-an-svg-element-is-hovered
+    #mypopup {
+    width: 400px;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    background-color: white;
+    border-radius: 6px;
+    position: absolute;
+    display: none;
+    }
+
+    #mypopup::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    transform: rotate(45deg);
+    background-color: white;
+    position: absolute;
+    left: -6px;
+    top: 68px;
+    }
+*/
+
         </style>
     </head>
     <!-- (C) 2020 by Florian Marquardt; MIT License -->
     <body style="margin:0px">
-        <div style="float:left;width:50%;background-color:wheat">
+        <div style="float:left;width:50%;background-color:wheat" id="div_canvas">
             <svg id="canvas" viewBox="0 0 400 400" style="width:100%;height:100%">
             </svg>
         </div>
-        <div style="float:left;width:50%;">
+        <div style="float:left;width:50%;" id="div_input">
             <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:18;background-color:darkseagreen;color:white" oninput="text_changed()">
 There is an [electron](https://en.wikipedia.org/wiki/Electron)<!--146|150|cadetblue--> and the [☀️ sun](https://en.wikipedia.org/wiki/Sun)<!--227|138|darkblue-->
 
@@ -52,7 +85,7 @@ Code by Florian Marquardt, 2020.
                 }
                 objects=new Array() // empty array of objects
                 // regexp pattern for the (text|x|y|color) strings:
-                var patt = /\[([^\]]+)\]\(([^\)]*)\)<!--([^|]+)\|([^|]+)\|([^-]+)--\>/g
+                var patt = /\[([^\]]+)\]\(([^\)]*)\)<!--([^|]+)\|([^|]+)\|([^-]+)--\>(\n[^\[\n]+)?/g
                 // go through all matches and create objects
                 do {
                     matches=patt.exec(txt)
@@ -64,8 +97,13 @@ Code by Florian Marquardt, 2020.
                             x=parseFloat(matches[3])
                             y=parseFloat(matches[4])
                             colorstr=matches[5]
+                            if(matches.length>=7) {
+                                panel_text=matches[6]
+                            } else {
+                                panel_text=null
+                            }
                             if(!isNaN(x) && !isNaN(y)) {
-                                var obj=rubberbox(x,y,textstr,colorstr,"white","font-family:\"Arial Black\";font-size:12",linkstr)
+                                var obj=rubberbox(x,y,textstr,colorstr,"white","font-family:\"Arial Black\";font-size:12",linkstr,"This would be a little abstract.")
                                 // attach event listeners to the rectangle (not the group, which does not work)
                                 the_rect=obj.childNodes[0]
                                 the_rect.addEventListener("mouseenter",mouseEnter)
@@ -83,6 +121,7 @@ Code by Florian Marquardt, 2020.
                                 obj.color_str=colorstr
                                 obj.text_str=textstr
                                 obj.link_str=linkstr
+                                obj.panel_text=panel_text // get rid of leading \n
                                 // the official coordinates:
                                 obj.official_x=x
                                 obj.official_y=y
@@ -106,7 +145,12 @@ Code by Florian Marquardt, 2020.
             // update the text description of an object inside the text area
             function update_obj_text(obj) {
                 // convert the revised properties of the object into text:
-                new_obj_text="["+obj.text_str+"]("+obj.link_str+")<!--"+Math.round(obj.official_x)+"|"+Math.round(obj.official_y)+"|"+obj.color_str+"-->"
+                if(!obj.panel_text) {
+                    var the_panel_text=""
+                } else {
+                    var the_panel_text=obj.panel_text
+                }
+                new_obj_text="["+obj.text_str+"]("+obj.link_str+")<!--"+Math.round(obj.official_x)+"|"+Math.round(obj.official_y)+"|"+obj.color_str+"-->"+the_panel_text
                 // update the text area:
                 txt=replace_string(txt,obj.text_start,obj.text_end,new_obj_text)
                 txt_field.value=txt
@@ -121,7 +165,7 @@ Code by Florian Marquardt, 2020.
                 }
             }
 
-            function rubberbox(x,y,string,rectcolor,textcolor,textstyle,link) {
+            function rubberbox(x,y,string,rectcolor,textcolor,textstyle,link,linktitle) {
                 canvas=document.getElementById("canvas")
                 var group=document.createElementNS ('http://www.w3.org/2000/svg', 'g')
                 var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
@@ -133,6 +177,9 @@ Code by Florian Marquardt, 2020.
                     var linkbox= document.createElementNS ('http://www.w3.org/2000/svg', 'a')
                     linkbox.setAttributeNS('http://www.w3.org/1999/xlink', "xlink:href", link)
                     linkbox.setAttribute("target","_blank")
+                    if(linktitle.length>0) {
+                        linkbox.setAttribute("title",linktitle)
+                    }
                 }
                 var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
                 text.setAttribute("x",x)
@@ -164,6 +211,12 @@ Code by Florian Marquardt, 2020.
                 }
                 evt.target.setAttribute("stroke","white")
                 evt.target.setAttribute("stroke-width",1)
+                if(!panel) {
+                    if(evt.target.official_object.panel_text) {
+                        console.log("showing panel")
+                        show_panel(evt.target.official_object.panel_text,evt.target.official_object.text_str)
+                    }
+                }
                 current_object=evt.target.official_object
                 oldpos=null
             }
@@ -176,6 +229,9 @@ Code by Florian Marquardt, 2020.
                 if(!current_object.contains(evt.relatedTarget)) {
                         evt.target.setAttribute("stroke",null)
                         current_object=null
+                        if(panel) {
+                            hide_panel()
+                        }
                 }
             }
 
@@ -209,6 +265,8 @@ Code by Florian Marquardt, 2020.
                             update_obj_text(current_object) // update text area!
                         }
                         oldpos=pos
+                    } else {
+                        mouseMoveCanvas(evt)
                     }
                 }
             }
@@ -246,10 +304,121 @@ Code by Florian Marquardt, 2020.
                 let paste = (event.clipboardData || window.clipboardData).getData('text');
 
                 if(paste.startsWith("http")) {
-                    insertTextAtCursor(txt_field,"[]("+paste+")<!--10|10|orange-->\n")
+                    insertTextAtCursor(txt_field,"[]("+paste+")<!--10|10|darkorange-->\n")
                     event.preventDefault();
                 }
             })
+
+
+            function mouseWheel(e) {
+                if(e.deltaY>0) {
+                    factor=1.02
+                } else {
+                    factor=1/1.02
+                }
+                canvas=document.getElementById('canvas')
+                var VB=canvas.getAttribute("viewBox").match("([\-\.e0-9]*) ([\-\.e0-9]*) ([\-\.e0-9]*) ([\-\.e0-9]*)")
+                var X=parseFloat(VB[1])
+                var Y=parseFloat(VB[2])
+                var W=parseFloat(VB[3])
+                var H=parseFloat(VB[4])
+
+                X+=W*0.5
+                Y+=H*0.5
+                W*=factor
+                H*=factor
+                X-=W*0.5
+                Y-=H*0.5
+
+                canvas.setAttribute("viewBox",X+" "+Y+" "+W+" "+H)
+                e.preventDefault() // stop whole page from scrolling
+            }
+
+            function mouseMoveCanvas(e) {
+                if(e.buttons>0) {
+                    canvas=document.getElementById('canvas')
+                    var VB=canvas.getAttribute("viewBox").match("([\-\.e0-9]*) ([\-\.e0-9]*) ([\-\.e0-9]*) ([\-\.e0-9]*)")
+                    var X=parseFloat(VB[1])
+                    var Y=parseFloat(VB[2])
+                    X-=1.0*e.movementX
+                    Y-=1.0*e.movementY
+                    canvas.setAttribute("viewBox",X+" "+Y+" "+VB[3]+" "+VB[4])
+                }
+            }
+
+            panel=null
+
+            function hide_panel() {
+                if(panel) {
+                    panel.remove()
+                    panel=null
+                }
+            }
+
+            function setAttributes(elem,attributes) {
+                for (var i = 1; i < attributes.length; i+=2) {
+                    elem.setAttribute(attributes[i],attributes[i+1]);
+                }
+            }
+
+            function add_element() {
+                args=Array.from(arguments)
+                var shape = document.createElement(args[0]);
+                setAttributes(shape,args);
+                document.getElementById("div_canvas").appendChild(shape);
+                return shape;
+            }
+
+            function show_panel(panel_text,panel_title) {
+                if(!panel) {
+                    // if(panel_text.charAt(0)=='\n') {
+                    //     panel_text=panel_text.substring(2)
+                    // }
+                    panel=add_element("div","class","vertical-center")
+                    panel.setAttribute("pointer-events","none")
+
+                    panel.style="position:absolute;width:400px;margin-left:auto;margin-right:auto;left:0;right:0;color:white;background-color:rgba(0,0,0,0.7);font-family:Helvetica;font-weight:100;font-size:1.5em;border-radius:5px;padding:10px"
+                    panel.innerHTML="<b>"+panel_title+"</b><br><p style='color: white; width:400px; max-width:400px; height:400px'>"+panel_text+"</p>\n"
+                }
+            }
+
+            canvas=document.getElementById('canvas')
+            canvas.addEventListener('wheel', mouseWheel)
+
+            txt_field_hidden=false
+            function myKeyDown(event) {
+                if (event.code === 'Escape') {
+                    if(panel) {
+                        hide_panel()
+                    } else {
+                        if(txt_field_hidden) {
+                            document.getElementById("div_canvas").style.float="left"
+                            document.getElementById("div_canvas").style.width="50%"
+                            document.getElementById("div_input").style.display="block"
+                            txt_field_hidden=false
+                        } else {
+                            document.getElementById("div_input").style.display="none"
+                            document.getElementById("div_canvas").style.width="100%"
+                            document.getElementById("div_canvas").style.float="none"
+                            txt_field_hidden=true
+                        }
+                    }
+                }
+            }
+
+            document.onkeydown=myKeyDown
+
+            // from: https://stackoverflow.com/questions/46384057/how-to-display-a-tooltip-div-when-an-svg-element-is-hovered
+            // function showPopup(evt) {
+            // var iconPos = myicon.getBoundingClientRect();
+            // mypopup.style.left = (iconPos.right + 20) + "px";
+            // mypopup.style.top = (window.scrollY + iconPos.top - 60) + "px";
+            // mypopup.style.display = "block";
+            // }
+
+            // function hidePopup(evt) {
+            // mypopup.style.display = "none";
+            // }
         </script>
     </body>
 </html>
