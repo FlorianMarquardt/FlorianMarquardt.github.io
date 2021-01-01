@@ -405,6 +405,7 @@ Code by Florian Marquardt, 2020.
                     var Y=parseFloat(VB[2])
                     X-=1.0*e.movementX
                     Y-=1.0*e.movementY
+                    document.getElementById("debug_field").innerHTML="MMCB "+e.movementX+" "+e.movementY
                     canvas.setAttribute("viewBox",X+" "+Y+" "+VB[3]+" "+VB[4])
                 }
             }
