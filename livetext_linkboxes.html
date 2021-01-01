@@ -346,13 +346,15 @@ Code by Florian Marquardt, 2020.
             function touchStart(evt) {
                 document.getElementById("debug_field").innerHTML="TS "+evt.pageX+" "+evt.pageY
 //                evt.buttons=1
-//                mouseEnter(evt)                
+//                mouseEnter(evt)  
+                evt.preventDefault()
             }
 
             function touchMove(evt) {
                 document.getElementById("debug_field").innerHTML="TM "+evt.pageX+" "+evt.pageY
 //                mouseMove(evt)
 //                evt.preventDefault()
+                evt.preventDefault()
             }
 
             // init:
