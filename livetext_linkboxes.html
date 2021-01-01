@@ -346,7 +346,8 @@ Code by Florian Marquardt, 2020.
             function touchStart(evt) {
                 document.getElementById("debug_field").innerHTML="TS "+evt.pageX+" "+evt.pageY
                 evt.buttons=1
-                mouseEnter(evt)  
+                current_object=null
+                mouseEnter(evt)
                 evt.preventDefault()
             }
 
