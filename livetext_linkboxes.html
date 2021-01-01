@@ -395,7 +395,7 @@ Code by Florian Marquardt, 2020.
             }
 
             function mouseMoveCanvas(e) {
-                document.getElementById("debug_field").innerHTML="MMC"
+                document.getElementById("debug_field").innerHTML="MMC "+e.buttons
 
                 if(e.buttons>0) {
                     canvas=document.getElementById('canvas')
