@@ -63,6 +63,7 @@
         </style>
     </head>
     <!-- (C) 2020 by Florian Marquardt; MIT License -->
+    <!-- free icons from material design icons -->
     <body style="margin:0px">
         <div style="float:left;width:50%;background-color:wheat" id="div_canvas">
             <svg id="canvas" viewBox="0 0 400 400" style="width:100%;height:100%">
@@ -141,6 +142,7 @@ Code by Florian Marquardt, 2020.
                                 // attach event listeners to the rectangle (not the group, which does not work)
                                 the_rect=obj.childNodes[0]
                                 the_rect.addEventListener("mouseenter",mouseEnter)
+                                the_rect.addEventListener("touchstart",touchStart)
                                 the_rect.addEventListener("mouseleave",mouseLeave)
                                 
                                 the_rect.official_object=obj // save reference back to the overall group
@@ -321,6 +323,10 @@ Code by Florian Marquardt, 2020.
                 }
             }
 
+            function touchStart(evt) {
+                mouseEnter(evt)
+            }
+
             function touchMove(evt) {
                 evt.buttons=1 // to fool the mouseMove function
                 mouseMove(evt)
@@ -479,18 +485,6 @@ Code by Florian Marquardt, 2020.
             }
 
             document.onkeydown=myKeyDown
-
-            // from: https://stackoverflow.com/questions/46384057/how-to-display-a-tooltip-div-when-an-svg-element-is-hovered
-            // function showPopup(evt) {
-            // var iconPos = myicon.getBoundingClientRect();
-            // mypopup.style.left = (iconPos.right + 20) + "px";
-            // mypopup.style.top = (window.scrollY + iconPos.top - 60) + "px";
-            // mypopup.style.display = "block";
-            // }
-
-            // function hidePopup(evt) {
-            // mypopup.style.display = "none";
-            // }
         </script>
     </body>
 </html>
