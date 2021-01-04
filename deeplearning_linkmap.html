@@ -1,0 +1,725 @@
+<html >
+    <title>
+        LinkMap
+    </title>
+    <head>
+        <meta charset="utf-8"/> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+    svg text{
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    }
+
+    .upper-left {
+        left: 0px;
+        top: 0px;
+        margin: 5px;
+        padding: 10px;
+        position: fixed;
+        background-color: rgb(0,0,0,0.5);
+        font-family: Arial-Black;
+        font-size:24;
+        color: white;
+        border-radius: 20px;
+        display: block;
+        z-index: 3000;
+    }
+
+    .vertical-center {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        }
+        </style>
+    </head>
+    <!-- (C) 2020 by Florian Marquardt; MIT License -->
+    <!-- free icons from material.io design icons -->
+    <body style="margin:0px">
+        <div style="float:left;width:50%;background-color:wheat" id="div_canvas">
+            <svg id="canvas" viewBox="0 0 400 400" style="width:100%;height:100%">
+            </svg>
+        </div>
+        <div class="upper-left">
+            <p onclick="escapeAction();" style="margin:0">
+                <svg width="48" height="48" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path id="icon_textfield" fill="palegreen" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            </p>
+            <p onclick="toggleLinksActive();toggleDraggingActive();" style="margin:0">
+                <svg height="48" viewBox="0 0 24 24" width="48"><path clip-rule="evenodd" d="M0 0h24v24H0z" fill="none"/><path id="icon_editing" fill="black" d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+            </p>
+            <p onclick="showHelpPanel();" style="margin:0">
+                <svg height="48" viewBox="0 0 24 24" width="48"><path d="M0 0h24v24H0z" fill="none"/><path id="icon_helppanel" fill="black" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+            </p>
+            <!-- <p id="debug_field">
+                Version 0.69
+            </p> -->
+        </div>
+        <div style="float:left;width:50%;" id="div_input">
+            <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:18;background-color:darkseagreen;color:white" oninput="text_changed()">
+# Machine Learning Classics
+
+[Visual receptive filters from learning sparse features 96 Field](https://www.nature.com/articles/381607a0)<!---885|630|darkorange-->
+Shows that enforcing sparsity helps to turn the lowest-layer filters of an image recognition network into something resembling what is found in the human visual cortex (Gabor-type filters).
+
+[Review: Neural Networks 89 Hinton](http://www.cs.toronto.edu/~fritz/absps/clp.pdf)<!---880|134|gray-->
+"Connectionist Learning Procedures". This review covers the state of the art in 1989, including backpropagation, Hopfield models, Boltzmann machines, reinforcement learning, a first mention of autoencoders (self-supervision), some remarks on mutual information, and much more. Marvellous!
+
+
+[]()<!---1200|252|500|350|beige-->
+
+[Backpropagation and Gradient Descent]()<!---1429|256|cadetblue-->
+
+[Original backpropagation algorithm 76 Linnainmaa](https://link.springer.com/article/10.1007/BF01931367)<!---1431|296|darkorange-->
+"Taylor expansion of the accumulated rounding error". Discusses automatic differentiation. Not yet applied to neural networks.
+
+[Backpropagation 85 Hinton](http://www.cs.utoronto.ca/~hinton/absps/naturebp.pdf)<!---1431|332|darkorange-->
+Rumelhart, Hinton, Williams. The famous introduction of backpropagation for neural networks. Practical applications. Already includes gradient descent with 'momentum'.
+
+[Neural networks approximate arbitrary functions 89 Cybenko](https://link.springer.com/article/10.1007/BF02551274)<!---1431|367|darkorange-->
+The original proof of the fact that neural networks with at least one hidden layer can approximate arbitrary smooth functions (with sufficiently many neurons).
+
+[Adam 14 Kingma](https://arxiv.org/abs/1412.6980)<!---1432|459|darkorange-->
+Everyone's favourite adaptive stochastic gradient descent algorithm.
+
+[]()<!---99|240|500|350|beige-->
+
+[Autoencoders]()<!---333|245|cadetblue-->
+
+[Linear autoencoders 89 Hornik](https://www.sciencedirect.com/science/article/abs/pii/0893608089900142?via%3Dihub)<!---328|280|darkorange-->
+They introduce a linear autoencoder and show that it is doing PCA.
+
+[Minimum description length principle for autoencoders 93 Hinton](http://www.cs.toronto.edu/~hinton/absps/cvq.pdf)<!---331|618|darkorange-->
+The 'minimum description length principle' for a communication channel tries to minimize the combined size of the 'code' (latent variables) plus the description of the deviation of the output plus the specification of the decoder. They apply this to autoencoders.
+
+[Deep autoencoders & pretraining 06 Hinton](https://www.cs.toronto.edu/~hinton/science.pdf)<!---327|344| darkorange-->
+Uses RBM for pretraining, proposes layer-wise pretraining for deep architectures. Science article, with examples from different applications.
+
+[Denoising autoencoders 10 Bengio](http://www.cs.toronto.edu/~larocheh/publications/vincent10a.pdf)<!---327|376|darkorange-->
+Adds noise to the input and demands output equals the clean image, which defines their denoising autoencoder. 
+
+[Contractive Autoencoders 11 Bengio](http://www.icml-2011.org/papers/455_icmlpaper.pdf)<!---328|408|darkorange-->
+Adds a penalty for (grad f)^2, where f is the encoder.
+
+[Variational Autoencoders 13 Welling](https://arxiv.org/abs/1312.6114)<!---330|439| darkorange-->
+Enforces the distribution of latent variables to be a normal Gaussian, such that one can sample from this distribution to generate valid data.
+
+[Review: Representation Learning 12 Bengio](https://arxiv.org/abs/1206.5538)<!---329|505|gray-->
+Unsupervised learning of useful features. Covers autoencoders, PCA, sparse coding, distributed representations, and more.
+
+[]()<!--446|239|500|350|beige-->
+
+[Learning to sample]()<!--214|245|cadetblue-->
+
+
+[Boltzmann Machines 85 Sejnowski](https://onlinelibrary.wiley.com/doi/abs/10.1207/s15516709cog0901_7)<!--216|280|darkorange-->
+The original paper that introduced Boltzmann machines as a tool for learning to sample from an observed probability distribution. Explains the connections to statistical physics and the learning procedure.
+
+[Variational Autoencoders 13 Welling](https://arxiv.org/abs/1312.6114)<!--217|397| darkorange-->
+Enforces the distribution of latent variables to be a normal Gaussian, such that one can sample from this distribution to generate valid data.
+
+[Generative Adversarial Networks 14 Goodfellow](https://papers.nips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf)<!--217|428|darkorange-->
+Introduces GANs, where a generator network tries to fool a discriminator network into believing an image is not fake. Optimizes G and D via min_G max_D { E log(D(x)) + E log(1-D(G(z))) }. Compares with other sampling approaches. Emphasizes this does not need a Markov chain.
+
+
+
+[Curriculum learning 09 Bengio](http://ronan.collobert.com/pub/matos/2009_curriculum_icml.pdf)<!--803|750|darkorange-->
+The technique of first learning simple tasks and then gradually increasing the complexity.
+
+
+
+[]()<!---650|252|500|350|beige-->
+
+[Convolutional Neural Networks]()<!---884|263|cadetblue-->
+
+[Neocognitron 80 Fukushima](https://www.cs.princeton.edu/courses/archive/spr08/cos598B/Readings/Fukushima1980.pdf)<!---882|295|darkorange-->
+The grandparent of all convolutional neural networks. Far ahead of its time: a multilayer (deep) convolutional structure, with unsupervised learning. Inspired by the human visual cortex.
+
+[Deep CNN for digit recognition 89 LeCun](https://papers.nips.cc/paper/1989/file/53c3bce66e43be4f209556518c2fcb54-Paper.pdf)<!---883|328|darkorange-->
+First to use backpropagation to train a multilayer CNN. Here applied to MNIST-style dataset of handwritten digits.
+
+[Convolutional deep belief networks 09 Ng](http://ai.stanford.edu/~ang/papers/icml09-ConvolutionalDeepBeliefNetworks.pdf)<!---881|388|darkorange-->
+A deep belief network is several RBMs, stacked on top of each other. Here they introduce the convolutional version.
+
+[ImageNet using Deep CNN 12 Hinton](https://dl.acm.org/doi/10.1145/3065386)<!---882|422|darkorange-->
+The summary of the famous deep CNN that won the 2012 ImageNet competition, using ReLU and dropout in a deep CNN.
+
+[Dropout 12 Hinton](https://arxiv.org/abs/1207.0580v1)<!---880|458|darkorange-->
+Introduces the technique of dropout, randomly setting neuron values to zero during training. This makes the network more robust and especially prevents overfitting.
+
+[U-Nets 15 Ronneberger](https://arxiv.org/abs/1505.04597)<!---885|501|darkorange-->
+Introduces U-Nets, with symmetric down- and upsampling paths and skip-connections. Very efficient for large images. Particularly useful for image transformation and segmentation (where each pixel must receive a label), winning competitions.
+
+[Residual Networks 15 Sun](https://arxiv.org/abs/1512.03385)<!---884|534|darkorange-->
+Introduces ResNets: learning not a function but a function minus the identity, and repeating this module. Are able to go to very deep networks for superior ImageNet results (previously really deep nets had more trouble learning than shallower nets).
+
+[]()<!---642|721|500|200|beige-->
+
+[Active Learning]()<!---863|727|cadetblue-->
+
+[Deep Bayesian active learning 17 Gal](https://arxiv.org/abs/1703.02910)<!---867|809|darkorange-->
+Bayesian neural networks allow better to quantify their uncertainty, and this can be used to determine where to sample next in an active learning scenario. They apply this to image learning, e.g. MNIST, using their network to indicate which of the available sample images it wants to receive a label for.
+
+[Review: Bayesian optimization of complex cost functions 10 Freitas](https://arxiv.org/pdf/1012.2599.pdf)<!---866|763|gray-->
+A tutorial on using Bayesian optimization and Gaussian processes to quickly find the maximum of a function. Introduces concepts such as the acquisition function. Comments on optimization vs. experimental design vs. active learning.
+
+[Bayesian networks 15 Gal](https://arxiv.org/abs/1506.02158)<!---877|974|darkorange-->
+Introducing networks that deal with small amounts of data more robustly and can quantify their uncertainty. Conceptually works with a probability distribution over the weights. In practice, uses dropout.
+
+[Review: Active Learning for Deep Learning 20 Gildenblat](https://jacobgil.github.io/deeplearning/activelearning)<!---867|874|gray-->
+(webpage) Nice recent overview of some concepts and articles.
+
+
+
+[]()<!---1197|720|500|200|beige-->
+
+[Inspecting Neural Networks]()<!---1426|724|cadetblue-->
+
+[t-SNE 08 Hinton](http://www.cs.toronto.edu/~hinton/absps/tsne.pdf)<!---1425|809|darkorange-->
+Everyone's favourite nonlinear dimensionality reduction technique for visualization.
+
+
+[]()<!---102|726|500|200|beige-->
+
+[Time series and natural language processing]()<!---328|730|cadetblue-->
+
+
+
+[Long Short-Term Memory 95 Schmidhuber](http://people.idsia.ch/~juergen/FKI-207-95ocr.pdf)<!---329|764|darkorange-->
+The classic paper describing how to get rid of exploding/vanishing gradients in recurrent networks using gated units. (Technical report version; there is a 97 version) 
+
+[(LSTM 97 Schmidhuber)](https://dl.acm.org/doi/10.1162/neco.1997.9.8.1735)<!---27|764|darkorange-->
+The 1997 official article
+
+[Attention 14 Bengio](https://arxiv.org/abs/1409.0473v7)<!---328|841|darkorange-->
+Introduces an attention mechanism for translation tasks: At each time step, the decoder RNN calculates an attention weight vector that indicates which vicinity of words in the input to focus on. The encoder bi-directional RNN has produced latent variables that indicate the context of each word (preceding and following words). This formed the basis for Transformers.
+
+[Differentiable Neural Computer 16 Graves](https://www.nature.com/articles/nature20101)<!---326|873|darkorange-->
+Defining a differentiable neural computer (DNC) with an arbitrary-size external memory of key-value entries that is accessed by read/write heads using queries. Several applications to challenges with graph-type input of variable size. Memory-access similar to the later Transformers.
+
+[Transformers 17 Vaswani](https://arxiv.org/abs/1706.03762)<!---325|905|darkorange-->
+"Attention is all you need": Encoder-decoder sequence transduction without recurrence or convolution, but employing attention. Uses queries to extract information from set of key-value pairs, using softmax dot-product attention (using "multiple heads"). Position is encoded via Fourier transform. Memory access similar to the earlier DNC.
+
+[Code: Tensorflow Transformer](https://www.tensorflow.org/tutorials/text/transformer)<!---326|950|royalblue-->
+Tutorial on the tensorflow website, for a full-blown transformer model (and language translation as an example). Each step nicely explained.
+
+[]()<!--446|727|500|200|beige-->
+
+[Graph networks]()<!--218|730|cadetblue-->
+
+[Graph Networks 05 Lengauer](https://pubs.acs.org/doi/pdf/10.1021/ci049613b)<!--214|765|darkorange-->
+Introduces graph neural networks, here in the context of chemistry. Transform a graph into a dynamical system with each node receiving input from neighbors at each time step. (here called "Molecular graph networks")
+
+[Graph Neural Network model 09 Scarselli](https://persagen.com/files/misc/scarselli2009graph.pdf)<!--213|798|darkorange-->
+Introduces general graph neural networks.
+
+[Neural message passing 17 Gilmer](https://arxiv.org/abs/1704.01212)<!--212|831|darkorange-->
+Emphasizes the 'message passing' aspect of graph neural networks and improves efficiency. Claims very good results on quantum chemistry benchmark problems. Also nice review of recent previous approaches.
+
+[Graph Transformer networks 20 Kim](https://arxiv.org/pdf/1911.06455.pdf)<!--212|868|darkorange-->
+Applies the transformer (attention-based) approach to process graphs.
+
+[Review: Graph neural networks 20 Hamilton](https://www.cs.mcgill.ca/~wlh/grl_book/files/GRL_Book-Chapter_5-GNNs.pdf)<!--214|908|gray-->
+(chapter in a book) Review of graph neural networks.
+
+
+
+[]()<!--997|241|500|350|beige-->
+
+[Reinforcement Learning]()<!--765|249|cadetblue-->
+
+[Q Learning 92 Watkins](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=98ECF011CFFA9E02C015F96A1DF3A471?doi=10.1.1.466.7149&rep=rep1&type=pdf)<!--768|289|darkorange-->
+
+[REINFORCE (policy gradient) 92 Williams](https://link.springer.com/article/10.1007/BF00992696)<!--769|323|darkorange-->
+
+[Review: Brief review of deep RL 17 Arulkumaran](https://arxiv.org/abs/1708.05866)<!--769|572|gray-->
+
+[RL for Atari video games 15 Mnih](https://www.nature.com/articles/nature14236)<!--770|618|darkorange-->
+
+[AlphaGo 16 Silver](https://www.nature.com/articles/nature16961)<!--1018|617|darkorange-->
+
+[AlphaGoZero 17 Silver](https://www.nature.com/articles/nature24270)<!--768|650|darkorange-->
+
+[AlphaZero 17 Silver](https://arxiv.org/abs/1712.01815v1)<!--941|650|darkorange-->
+
+[AlphaStar 19 Vinyals](https://www.nature.com/articles/s41586-019-1724-z)<!--1094|650|darkorange-->
+
+
+Compiled by Florian Marquardt, 2021. 
+                
+</textarea>
+        </div>
+
+        <script>
+            debug_prints=false
+
+            function text_changed() { // parse text area to draw objects!
+                txt_field=document.getElementById ('inputarea')
+                txt=txt_field.value
+                if(objects.length>0) { // delete old objects from svg canvas
+                    for(j=0;j<objects.length;j++) {
+                        objects[j].remove()
+                    }
+                }
+                objects=new Array() // empty array of objects
+                // regexp pattern for the (text|x|y|color) strings:
+                var patt = /\[([^\]]*)\]\(([^\)]*)\)\<\!\-\-([^\|]+)\|([^\|]+)\|([^\-]+)\-\-\>(\n[^\[\n]+)?/g
+                var subpatt = /([0-9\.]+)\|([0-9\.]+)\|(.*)/g
+                // go through all matches and create objects
+                do {
+                    matches=patt.exec(txt)
+                    go_on=false
+                    if(matches) {
+                        if(matches.length>=6) {
+                            textstr=matches[1]
+                            linkstr=matches[2]
+                            x=parseFloat(matches[3])
+                            y=parseFloat(matches[4])
+                            colorstr=matches[5]
+                            colormatch=subpatt.exec(colorstr)
+                            if(colormatch) {
+                                colorstr=colormatch[3]
+                                width=parseFloat(colormatch[1])
+                                height=parseFloat(colormatch[2])
+                            } else {
+                                width=null
+                                height=null
+                            }
+                            if(matches.length>=7) {
+                                panel_text=matches[6]
+                            } else {
+                                panel_text=null
+                            }
+
+                            if(!isNaN(x) && !isNaN(y)) {
+                                var obj=rubberbox(x,y,textstr,colorstr,"white","font-family:\"Arial Black\";font-size:12",linkstr,width,height)
+                                // attach event listeners to the rectangle (not the group, which does not work)
+                                the_rect=obj.childNodes[0]
+                                the_rect.addEventListener("mouseenter",mouseEnter)
+                                the_rect.addEventListener("touchstart",touchStart)
+                                the_rect.addEventListener("touchmove",touchMove)
+                                // also add to the link or text:
+                                //obj.childNodes[1].addEventListener("touchstart",touchStart)
+                                //obj.childNodes[1].addEventListener("touchstart",touchMove)
+                                the_rect.addEventListener("mouseleave",mouseLeave)
+                                
+                                the_rect.official_object=obj // save reference back to the overall group
+                                // Save reference to where in the text
+                                // the info is located! Need this to
+                                // update it upon drag...
+                                // (we are just adding new properties here
+                                // to the svg graphics object...not polite,
+                                // but it works for this simple example!)
+                                obj.text_start=matches.index
+                                obj.text_end=matches.index+matches[0].length
+                                obj.color_str=colorstr
+                                obj.text_str=textstr
+                                obj.link_str=linkstr
+                                obj.panel_text=panel_text // get rid of leading \n
+                                obj.official_width=width
+                                obj.official_height=height
+                                // the official coordinates:
+                                obj.official_x=x
+                                obj.official_y=y
+                                // the possible extra shift (will come later during dragging)
+                                obj.official_translate_x=0.0
+                                obj.official_translate_y=0.0
+                                obj.index_in_array=objects.length
+                                objects.push(obj) // new object
+                            }
+                            go_on=true
+                        }
+                    }
+                } while(go_on)
+
+            }
+
+            function replace_string(old_string,start,stop,new_insertion) {
+                return(old_string.slice(0,start)+new_insertion+old_string.slice(stop))
+            }
+
+            // update the text description of an object inside the text area
+            function update_obj_text(obj) {
+                // convert the revised properties of the object into text:
+                if(!obj.panel_text) {
+                    var the_panel_text=""
+                } else {
+                    var the_panel_text=obj.panel_text
+                }
+                if(obj.official_width) {
+                    var the_color_text=obj.official_width+"|"+obj.official_height+"|"+obj.color_str
+                } else {
+                    var the_color_text=obj.color_str
+                }
+                new_obj_text="["+obj.text_str+"]("+obj.link_str+")<!--"+Math.round(obj.official_x)+"|"+Math.round(obj.official_y)+"|"+the_color_text+"-->"+the_panel_text
+                // update the text area:
+                txt=replace_string(txt,obj.text_start,obj.text_end,new_obj_text)
+                txt_field.value=txt
+                // update end point of text reference:
+                old_text_end=obj.text_end
+                obj.text_end=obj.text_start+new_obj_text.length
+                delta=obj.text_end-old_text_end
+                // also correct all subsequent text references:
+                for(j=obj.index_in_array+1;j<objects.length;j++) {
+                    objects[j].text_start+=delta
+                    objects[j].text_end+=delta
+                }
+            }
+
+            function rubberbox(x,y,string,rectcolor,textcolor,textstyle,link,width,height) {
+                canvas=document.getElementById("canvas")
+                var group=document.createElementNS ('http://www.w3.org/2000/svg', 'g')
+                var rect= document.createElementNS ('http://www.w3.org/2000/svg', 'rect')
+                rect.setAttribute("fill",rectcolor)
+                rect.setAttribute("rx",5)
+                rect.setAttribute("ry",5)
+                group.appendChild(rect)
+                if(link.length>0) {
+                    var linkbox= document.createElementNS ('http://www.w3.org/2000/svg', 'a')
+                    linkbox.setAttributeNS('http://www.w3.org/1999/xlink', "xlink:href", link)
+                    linkbox.setAttribute("target","_blank")
+                    linkbox.addEventListener('touchmove', function (event) {
+                        if (!linksActive) {
+                            touchMove(event)
+                        }
+                    });
+                    linkbox.addEventListener('touchstart', function (event) {
+                        if (!linksActive) {
+                            touchStart(event)
+                        }
+                    });
+                    linkbox.addEventListener('click', function (event) {
+                        if (!linksActive) {
+                            event.preventDefault();
+                        }
+                    });
+                }
+                var text= document.createElementNS ('http://www.w3.org/2000/svg', 'text')
+                text.setAttribute("x",x)
+                text.setAttribute("y",y)
+                text.setAttribute("fill",textcolor)
+                text.setAttribute("style",textstyle)
+//                text.setAttribute("pointer-events","none")
+                text.textContent=string
+                if(link.length>0) {
+                    linkbox.appendChild(text)
+                    group.appendChild(linkbox)
+                } else {
+                    text.addEventListener('touchmove', function (event) {
+                        if (draggingActive) {
+                            touchMove(event)
+                        }
+                    });
+                    text.addEventListener('touchstart', function (event) {
+                        if (draggingActive) {
+                            touchStart(event)
+                        }
+                    });                    
+                    group.appendChild(text)
+                }
+                canvas.appendChild(group)
+                bbox=text.getBBox()
+                if(width) {
+                    rect.setAttribute("width",width)
+                    rect.setAttribute("height",height)
+                    rect.setAttribute("x",x-0.5*width+0.5*bbox.width)
+                    rect.setAttribute("y",y-1.0*bbox.height)
+                } else {
+                    rect.setAttribute("width",bbox.width+1.0*bbox.height)
+                    rect.setAttribute("height",1.5*bbox.height)
+                    rect.setAttribute("x",x-0.5*bbox.height)
+                    rect.setAttribute("y",y-1.0*bbox.height)
+                }
+                return(group)
+            }
+
+
+            // mouse entered an object
+            function mouseEnter(evt) {
+                if(debug_prints) {
+                    document.getElementById("debug_field").innerHTML="ME"
+                }
+
+                if(current_object) { // we are already dragging something!
+                    return
+                }
+                evt.target.setAttribute("stroke","white")
+                evt.target.setAttribute("stroke-width",1)
+                if(!panel) {
+                    if(evt.target.official_object.panel_text) {
+                        console.log("showing panel")
+                        show_panel(evt.target.official_object.panel_text,evt.target.official_object.text_str)
+                    }
+                }
+                current_object=evt.target.official_object
+                oldpos=null
+            }
+
+            // mouse left
+            function mouseLeave(evt) {
+                if(evt.buttons>0) { // we are already dragging
+                    return
+                }
+                if(!current_object.contains(evt.relatedTarget)) {
+                        evt.target.setAttribute("stroke",null)
+                        current_object=null
+                        if(panel) {
+                            hide_panel()
+                        }
+                }
+            }
+
+            // mouse is moving (means: dragging, if button is down)
+            function mouseMove(evt) {
+                if(evt.buttons>0) {
+                    if(current_object && draggingActive) {
+                        evt.preventDefault()
+                        // the most complex thing: properly
+                        // transforming from screen coordinates to
+                        // object coordinates:
+                        canvas=document.getElementById('canvas')
+                        var pos = canvas.createSVGPoint()
+                        pos.x = evt.pageX
+                        pos.y = evt.pageY
+                        var ctm = canvas.getScreenCTM()
+                        if (ctm = ctm.inverse()) {
+                            pos=pos.matrixTransform(ctm)
+                        }
+                        if(oldpos) {
+                            delta_x=pos.x-oldpos.x
+                            delta_y=pos.y-oldpos.y
+//                            console.log(delta_x,delta_y)
+                            current_object.official_x+=delta_x // move it!
+                            current_object.official_y+=delta_y
+                            current_object.official_translate_x+=delta_x
+                            current_object.official_translate_y+=delta_y                            
+                            // setting the new transform for the svg group object
+                            current_object.setAttribute("transform",
+                            "translate("+current_object.official_translate_x+","+current_object.official_translate_y+")");
+                            update_obj_text(current_object) // update text area!
+                        }
+                        oldpos=pos
+                    } else {
+                        mouseMoveCanvas(evt.movementX,evt.movementY)
+                    }
+                }
+            }
+
+            function touchStartCanvas(evt) {
+                if(debug_prints) {
+                    document.getElementById("debug_field").innerHTML="TSC"+evt.pageX+" "+evt.pageY
+                }
+                touch_oldX=evt.pageX
+                touch_oldY=evt.pageY
+            }
+
+            function touchMoveCanvas(evt) {
+                if(debug_prints) {
+                    document.getElementById("debug_field").innerHTML="TMC "+evt.pageX+" "+evt.pageY
+                }
+                movX=evt.pageX-touch_oldX
+                movY=evt.pageY-touch_oldY
+                touch_oldX=evt.pageX
+                touch_oldY=evt.pageY
+                if(debug_prints) {
+                    document.getElementById("debug_field").innerHTML="-MMC "+movX+" "+movY
+                }
+                mouseMoveCanvas(movX,movY)
+                evt.preventDefault()
+            }
+
+            function touchStart(evt) {
+                if(debug_prints) {
+                    document.getElementById("debug_field").innerHTML="TS "+evt.pageX+" "+evt.pageY
+                }
+                evt.buttons=1
+                current_object=null
+                mouseEnter(evt)
+                evt.preventDefault()
+            }
+
+            function touchMove(evt) {
+                if(debug_prints) {
+                    document.getElementById("debug_field").innerHTML="TM "+evt.pageX+" "+evt.pageY
+                }
+                evt.buttons=1
+                mouseMove(evt)
+                evt.preventDefault()
+            }
+
+            // init:
+            objects=new Array()
+            text_changed() // parse text for a first time, to show objects
+            current_object=null
+
+            canvas=document.getElementById("canvas")
+            canvas.addEventListener("mousemove",mouseMove)
+            //canvas.addEventListener("touchstart",touchStartCanvas)            
+            //canvas.addEventListener("touchmove",touchMoveCanvas)
+
+            function insertTextAtCursor(el, text) {
+                var val = el.value, endIndex, range, doc = el.ownerDocument;
+                if (typeof el.selectionStart == "number"
+                        && typeof el.selectionEnd == "number") {
+                    endIndex = el.selectionEnd;
+                    el.value = val.slice(0, endIndex) + text + val.slice(endIndex);
+                    el.selectionStart = el.selectionEnd = endIndex + text.length;
+                } else if (doc.selection != "undefined" && doc.selection.createRange) {
+                    el.focus();
+                    range = doc.selection.createRange();
+                    range.collapse(false);
+                    range.text = text;
+                    range.select();
+                }
+            }
+
+            txt_field=document.getElementById ('inputarea')
+            txt_field.addEventListener('paste', (event) => {
+                let paste = (event.clipboardData || window.clipboardData).getData('text');
+
+                if(paste.startsWith("http")) {
+                    insertTextAtCursor(txt_field,"[]("+paste+")<!--10|10|darkorange-->\n")
+                    event.preventDefault();
+                }
+            })
+
+
+            function mouseWheel(e) {
+                if(e.deltaY>0) {
+                    factor=1.02
+                } else {
+                    factor=1/1.02
+                }
+                canvas=document.getElementById('canvas')
+                var VB=canvas.getAttribute("viewBox").match("([\-\.e0-9]*) ([\-\.e0-9]*) ([\-\.e0-9]*) ([\-\.e0-9]*)")
+                var X=parseFloat(VB[1])
+                var Y=parseFloat(VB[2])
+                var W=parseFloat(VB[3])
+                var H=parseFloat(VB[4])
+
+                X+=W*0.5
+                Y+=H*0.5
+                W*=factor
+                H*=factor
+                X-=W*0.5
+                Y-=H*0.5
+
+                canvas.setAttribute("viewBox",X+" "+Y+" "+W+" "+H)
+                e.preventDefault() // stop whole page from scrolling
+            }
+
+            function mouseMoveCanvas(movX,movY) {
+                if(debug_prints) {
+                    document.getElementById("debug_field").innerHTML="MMC"
+                }
+
+                var VB=canvas.getAttribute("viewBox").match("([\-\.e0-9]*) ([\-\.e0-9]*) ([\-\.e0-9]*) ([\-\.e0-9]*)")
+                var X=parseFloat(VB[1])
+                var Y=parseFloat(VB[2])
+                X-=1.0*movX
+                Y-=1.0*movY
+                if(debug_prints) {
+                    document.getElementById("debug_field").innerHTML="MMCB "+movX+" "+movY
+                }
+                canvas.setAttribute("viewBox",X+" "+Y+" "+VB[3]+" "+VB[4])
+            }
+
+            panel=null
+            function hide_panel() {
+                if(panel) {
+                    panel.remove()
+                    panel=null
+                }
+            }
+
+            function setAttributes(elem,attributes) {
+                for (var i = 1; i < attributes.length; i+=2) {
+                    elem.setAttribute(attributes[i],attributes[i+1]);
+                }
+            }
+
+            function add_element() {
+                args=Array.from(arguments)
+                var shape = document.createElement(args[0]);
+                setAttributes(shape,args);
+                document.getElementById("div_canvas").appendChild(shape);
+                return shape;
+            }
+
+            function show_panel(panel_text,panel_title) {
+                if(!panel) {
+                    // if(panel_text.charAt(0)=='\n') {
+                    //     panel_text=panel_text.substring(2)
+                    // }
+                    panel=add_element("div","class","vertical-center")
+                    panel.setAttribute("pointer-events","none")
+
+                    panel.style="pointer-events:none; position:absolute;width:500px;margin-left:auto;margin-right:auto;left:0;right:0;color:white;background-color:rgba(0,0,0,0.7);font-family:Helvetica;font-weight:100;font-size:1.5em;border-radius:5px;padding:10px"
+                    panel.innerHTML="<b>"+panel_title+"</b><br><p style='color: white; width:500px; max-width:500px'>"+panel_text+"</p>\n"
+                }
+            }
+
+            canvas=document.getElementById('canvas')
+            canvas.addEventListener('wheel', mouseWheel)
+
+            linksActive=true
+            function toggleLinksActive() {
+                if(linksActive) {
+                    linksActive=false
+                } else {
+                    linksActive=true
+                }
+            }
+
+            draggingActive=false
+            function toggleDraggingActive() {
+                if(draggingActive) {
+                    document.getElementById("icon_editing").style.fill="black"
+                    draggingActive=false
+                } else {
+                    document.getElementById("icon_editing").style.fill="palegreen"
+                    draggingActive=true
+                }
+            }
+
+            function showHelpPanel() {
+                if(panel) {
+                    hide_panel()
+                }
+                show_panel("A web-app for arranging links in 2D, with info supplied by a wiki. Drag and mouse-wheel to navigate the map. Use the 'text' icon (or Escape) to toggle display of the wiki. Paste a link into the wiki to obtain a new link box (fill in the label inside [..]). Activate the tool icon to drag boxes around. Write text in the line after a link to display in a panel. Add 'width|height|' before color to produce larger rectangles. Copy&paste wiki text into any text editor to save it. Press Escape to close this panel. V0.8 (C) 2020 Florian Marquardt (MIT license).","<b>LinkMap</b>")
+            }
+
+            txt_field_hidden=false
+            function escapeAction() {
+                if(panel) {
+                    hide_panel()
+                } else {
+                    if(txt_field_hidden) {
+                        document.getElementById("icon_textfield").style.fill="palegreen"
+                        document.getElementById("div_canvas").style.float="left"
+                        document.getElementById("div_canvas").style.width="50%"
+                        document.getElementById("div_input").style.display="block"
+                        txt_field_hidden=false
+                    } else {
+                        document.getElementById("icon_textfield").style.fill="black"
+                        document.getElementById("div_input").style.display="none"
+                        document.getElementById("div_canvas").style.width="100%"
+                        document.getElementById("div_canvas").style.float="none"
+                        txt_field_hidden=true
+                    }
+                }
+            }
+
+            function myKeyDown(event) {
+                if (event.code === 'Escape') {
+                    escapeAction()
+                }
+            }
+
+            document.onkeydown=myKeyDown
+        </script>
+    </body>
+</html>
