@@ -60,21 +60,34 @@
         </div>
         <div style="float:left;width:50%;" id="div_input">
             <textarea id="inputarea" style="width:100%;height:100%;font-family:Courier;font-size:18;background-color:darkseagreen;color:white" oninput="text_changed()">
-There is an [electron](https://en.wikipedia.org/wiki/Electron)<!--146|150|cadetblue--> and the [☀️ sun](https://en.wikipedia.org/wiki/Sun)<!--227|138|darkblue-->
+This is a LinkMap: A 2D layout of links, controlled by a wiki.
+
+Click the 'help icon' (question mark) for a brief description of the functionality and read the following examples.
+
+[electron](https://en.wikipedia.org/wiki/Electron)<!--146|150|cadetblue-->
+[☀️ sun](https://en.wikipedia.org/wiki/Sun)<!--225|149|darkblue-->
+
+Entries without label or link, but with extra width|height| numbers just before the color keyword can be used to make rectangles, for indicating groups. Note that drawing order follows the order of entries here in this wiki: 
+
+[]()<!--208|11|350|100|beige-->
+
+Entries without a link can be used as simple labels or headers on the map:
+
+[Variational Autoencoders]()<!--47|12|cadetblue-->
+
+Anything in the line just below a link box will be used for display on a panel when the user hovers over the box:
+
+[Review: Intro Variational Autoencoders 19](https://arxiv.org/abs/1906.02691)<!--50|83|gray-->
+This is a nice review.
+
+[Original paper 13](https://arxiv.org/abs/1312.6114)<!--49|54|darkorange-->
+This is the original work on variational autoencoders.
+
+Hints: You can even insert emojis and symbols (like for the 'sun' above). You can also use 'transparent' for the color! All html colors are allowed. Try something like rgba(200,0,0,0.5)!
 
 
-
-[Variational Autoencoders]()<!--51|-5|darkred-->
-
-[Basics]()<!--50|25|red-->
-
-[Intro VAE 19](https://arxiv.org/abs/1906.02691)<!--50|83|orange-->
-
-[Original VAE 13](https://arxiv.org/abs/1312.6114)<!--49|54|orange-->
+Code by Florian Marquardt, 2020. See florianmarquardt.github.io.
                 
-Hints: On a Mac you use control+command+space to insert emojis. You can also use 'transparent' for the color! All html colors are allowed. Try something like rgba(200,0,0,0.5)!
-
-Code by Florian Marquardt, 2020.
 </textarea>
         </div>
 
@@ -482,8 +495,8 @@ Code by Florian Marquardt, 2020.
                     panel=add_element("div","class","vertical-center")
                     panel.setAttribute("pointer-events","none")
 
-                    panel.style="pointer-events:none; position:absolute;width:400px;margin-left:auto;margin-right:auto;left:0;right:0;color:white;background-color:rgba(0,0,0,0.7);font-family:Helvetica;font-weight:100;font-size:1.5em;border-radius:5px;padding:10px"
-                    panel.innerHTML="<b>"+panel_title+"</b><br><p style='color: white; width:400px; max-width:400px; height:400px'>"+panel_text+"</p>\n"
+                    panel.style="pointer-events:none; position:absolute;width:500px;margin-left:auto;margin-right:auto;left:0;right:0;color:white;background-color:rgba(0,0,0,0.7);font-family:Helvetica;font-weight:100;font-size:1.5em;border-radius:5px;padding:10px"
+                    panel.innerHTML="<b>"+panel_title+"</b><br><p style='color: white; width:500px; max-width:500px; height:400px'>"+panel_text+"</p>\n"
                 }
             }
 
@@ -514,7 +527,7 @@ Code by Florian Marquardt, 2020.
                 if(panel) {
                     hide_panel()
                 }
-                show_panel("A web-app for arranging links in 2D, with info supplied by a wiki. Use the 'text' icon or the Escape key to toggle display of the wiki source. Paste any link into the wiki to obtain a new link box (fill in the label inside [..]). Activate the tool icon to drag boxes around. Write text in the line after a link to display in a panel. Add '<width>|<height>|' before color to produce larger rectangles. Press Escape to close this panel. (C) 2020 Florian Marquardt (MIT license).","LinkMap")
+                show_panel("A web-app for arranging links in 2D, with info supplied by a wiki. Drag and mouse-wheel to navigate the map. Use the 'text' icon (or Escape) to toggle display of the wiki. Paste a link into the wiki to obtain a new link box (fill in the label inside [..]). Activate the tool icon to drag boxes around. Write text in the line after a link to display in a panel. Add 'width|height|' before color to produce larger rectangles. Copy&paste wiki text into any text editor to save it. Press Escape to close this panel. (C) 2020 Florian Marquardt (MIT license).","LinkMap")
             }
 
             txt_field_hidden=false
