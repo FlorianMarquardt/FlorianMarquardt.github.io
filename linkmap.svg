@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="176.78201mm"
+   height="150.52271mm"
+   viewBox="0 0 176.78201 150.52271"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     transform="translate(-22.016595,-68.066909)">
+    <rect
+       style="fill:#f4e3d7;stroke:none;stroke-width:0.765;stroke-linecap:round;stroke-linejoin:round"
+       id="rect12"
+       width="53.160706"
+       height="110.21016"
+       x="83.998367"
+       y="90.744583"
+       ry="3.0292673" />
+    <rect
+       style="fill:#f4e3d7;stroke:none;stroke-width:0.763556;stroke-linecap:round;stroke-linejoin:round"
+       id="rect4"
+       width="51.289036"
+       height="102.18877"
+       x="22.016596"
+       y="90.744583"
+       ry="3.0178442" />
+    <a
+       id="a4"
+       xlink:href="https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf"
+       target="_blank"
+       transform="translate(-1.429123,-12.00569)"
+       xlink:title="1948 A Mathematical Theory of Communication">
+      <g
+         id="g1">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect1"
+           width="44.337322"
+           height="7.6468711"
+           x="26.829124"
+           y="105.00363"
+           ry="2.3407974" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect1);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text1"
+           transform="translate(7.9597896,0.78162162)"><tspan
+             x="27.599318"
+             y="110.19003"
+             id="tspan3">Shannon</tspan></text>
+      </g>
+    </a>
+    <a
+       id="a3"
+       xlink:href="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"
+       target="_blank"
+       transform="translate(-20.727525,29.770458)"
+       xlink:title="1950 COMPUTING MACHINERY AND INTELLIGENCE">
+      <g
+         id="g2"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect2"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect2);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text2"
+           transform="translate(10.778657,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan4">Turing</tspan></text>
+      </g>
+    </a>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;fill:#666666;stroke-width:0.264583"
+       x="28.825323"
+       y="89.345284"
+       id="text6"><tspan
+         id="tspan6"
+         style="fill:#666666;stroke-width:0.264583"
+         x="28.825323"
+         y="89.345284">Foundations</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;fill:#666666;stroke-width:0.198436"
+       x="49.18586"
+       y="212.23962"
+       id="text7"><tspan
+         id="tspan7"
+         style="fill:#666666;stroke-width:0.198436"
+         x="49.18586"
+         y="212.23962">Hover the mouse over a box for a second to see the </tspan><tspan
+         style="fill:#666666;stroke-width:0.198436"
+         x="49.18586"
+         y="217.53128"
+         id="tspan8">year and title of the paper as a tooltip!</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;fill:#666666;stroke-width:0.264583"
+       x="149.20311"
+       y="88.685234"
+       id="text9"><tspan
+         id="tspan9"
+         style="fill:#666666;stroke-width:0.264583"
+         x="149.20311"
+         y="88.685234">Expert Systems</tspan></text>
+    <a
+       id="a11"
+       xlink:href="https://apps.dtic.mil/sti/tr/pdf/ADA155378.pdf"
+       target="_blank"
+       transform="translate(42.658423,50.251583)"
+       xlink:title="1976 Lenat: An Artificial Intelligence Approach to&#10;Discovery in Mathematics as Heuristic Search">
+      <g
+         id="g11"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect10"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect10);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text11"
+           transform="translate(15.914923,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan5">AM</tspan></text>
+      </g>
+    </a>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;fill:#666666;stroke-width:0.264583"
+       x="81.819756"
+       y="89.345284"
+       id="text12"><tspan
+         id="tspan12"
+         style="fill:#666666;stroke-width:0.264583"
+         x="81.819756"
+         y="89.345284">Artificial Discovery</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;fill:#666666;stroke-width:0.264583"
+       x="34.533485"
+       y="72.300232"
+       id="text13"><tspan
+         id="tspan13"
+         style="fill:#666666;stroke-width:0.264583"
+         x="34.533485"
+         y="72.300232">From Artificial Intelligence to Artificial Scientists</tspan></text>
+    <rect
+       style="fill:#f4e3d7;stroke:none;stroke-width:0.765;stroke-linecap:round;stroke-linejoin:round"
+       id="rect13"
+       width="52.358566"
+       height="94.969513"
+       x="146.44005"
+       y="90.744583"
+       ry="3.0292673" />
+    <a
+       id="a10"
+       xlink:href="https://profiles.nlm.nih.gov/spotlight/bb/catalog/nlm:nlmuid-101584906X1027-doc"
+       target="_blank"
+       transform="translate(104.9095,19.86904)"
+       xlink:title="1993 (review) Lindsay, Buchanan, Feigenbaum, Lederberg -- DENDRAL: A Case Study of the First Expert System for Scientific Hypothesis Formation">
+      <g
+         id="g10"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect9"
+           width="44.337322"
+           height="7.6468711"
+           x="42.08709"
+           y="115.27616"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect9);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text10"
+           transform="translate(9.1911566,0.56478564)"
+           onclick=""><tspan
+             x="42.859245"
+             y="120.46151"
+             id="tspan11">DENDRAL</tspan></text>
+      </g>
+    </a>
+    <a
+       id="a14"
+       xlink:href="https://www.ijcai.org/Proceedings/81-1/Papers/025.pdf"
+       target="_blank"
+       transform="translate(42.658423,71.418251)"
+       xlink:title="1981 Langley et al: BACON .5: The Discovery of Conservation Laws">
+      <g
+         id="g14"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect14"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect14);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text14"
+           transform="translate(11.15242,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan20">BACON</tspan></text>
+      </g>
+    </a>
+    <a
+       id="a16"
+       xlink:href="http://shelf1.library.cmu.edu/IMLS/MindModels/logictheorymachine.pdf"
+       target="_blank"
+       transform="translate(42.658423,10.034915)"
+       xlink:title="1956 Newell, Simon: The Logic Theory Machine">
+      <g
+         id="g15"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect15"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect15);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text15"
+           transform="translate(0.03992263,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan21">Logic Theorist</tspan></text>
+      </g>
+    </a>
+    <a
+       id="a17"
+       xlink:href="https://archive.computerhistory.org/resources/access/text/2023/06/102720392-05-01-acc.pdf"
+       target="_blank"
+       transform="translate(-20.727525,49.349628)"
+       xlink:title="1955 McCarthy, Minsky, Rochester, Shannon: A PROPOSAL FOR THE&#10;DARTMOUTH SUMMER RESEARCH PROJECT&#10;ON ARTIFICIAL INTELLIGENCE">
+      <g
+         id="g16"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect16"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect16);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text16"
+           transform="translate(5.4869903,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan22">Dartmouth</tspan></text>
+      </g>
+    </a>
+    <a
+       id="a18"
+       xlink:href="https://ia601506.us.archive.org/21/items/bitsavers_randiplP15roblemSolvingProgramFeb59_1757450/P-1584_Report_On_A_General_Problem-Solving_Program_Feb59_text.pdf"
+       target="_blank"
+       transform="translate(42.658423,29.084915)"
+       xlink:title="1959 Newell, Shaw, Simon:  General Problem Solver">
+      <g
+         id="g17"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect17"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect17);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text17"
+           transform="translate(15.385753,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan24">GPS</tspan></text>
+      </g>
+    </a>
+    <a
+       id="a19"
+       xlink:href="https://courses.csail.mit.edu/6.803/pdf/steps.pdf"
+       target="_blank"
+       transform="translate(-20.727525,70.516296)"
+       xlink:title="1961 (review) Minsky: Steps Toward Artificial Intelligence">
+      <g
+         id="g18"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect18"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect18);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text18"
+           transform="translate(5.4869903,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan40">Toward AI</tspan></text>
+      </g>
+    </a>
+    <a
+       id="a20"
+       xlink:href="http://jmc.stanford.edu/articles/mcc59/mcc59.pdf"
+       target="_blank"
+       transform="translate(104.80454,10.317802)"
+       xlink:title="1959 McCarthy: Programs with Common Sense">
+      <g
+         id="g19"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect19"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect19);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text19"
+           transform="translate(6.5453234,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan41">McCarthy</tspan></text>
+      </g>
+    </a>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text23"
+       transform="translate(-6.1385453,-73.796763)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan42">Compression and </tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan43">generative models</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:40.8963;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text25"
+       transform="translate(-5.8823506,-53.208536)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan44">AI as a vision and </tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan45">how to test for it</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:40.8963;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text26"
+       transform="translate(-5.8823506,-33.629369)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan46">Ambitious
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan47">conference</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:40.8963;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text27"
+       transform="translate(-5.8823506,-11.933534)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan48">Early review</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text28"
+       transform="translate(57.361457,-73.796763)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan49">Automating logic
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan50">proofs</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text29"
+       transform="translate(57.361457,-53.688429)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan51">General problem
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan52">solver</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text30"
+       transform="translate(119.39352,-73.141088)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan53">Programs with
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan54">common sense</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text31"
+       transform="translate(57.361457,-32.521764)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan55">Discovery of
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan56">mathematics</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text32"
+       transform="translate(57.361457,-11.355096)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan57">Discovering laws
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan58">from data</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text33"
+       transform="translate(120.3323,-52.100931)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan59">Deciphering mass
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan60">spectrograms</tspan></text>
+    <a
+       id="a34"
+       xlink:href="https://www.raysolomonoff.com/publications/1964pt1.pdf"
+       target="_blank"
+       transform="translate(-20.727525,87.978798)"
+       xlink:title="1964 Solomonoff: A formal theory of inductive inference">
+      <g
+         id="g34"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect33"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect33);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text34"
+           transform="translate(3.3703235,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan61">Solomonoff</tspan></text>
+      </g>
+    </a>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:44.1049;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text35"
+       transform="translate(-5.8823506,4.4706325)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan62">Discovering </tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan63">patterns in data</tspan></text>
+    <a
+       id="a36"
+       xlink:href="https://apps.dtic.mil/sti/tr/pdf/ADA159235.pdf"
+       target="_blank"
+       transform="translate(42.658423,93.114086)"
+       xlink:title="1985 Langley et al: Discovering qualitative empirical laws">
+      <g
+         id="g36"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect35"
+           width="44.337322"
+           height="7.6468711"
+           x="42.441315"
+           y="105.00363"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect35);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text36"
+           transform="translate(7.9774192,0.56478564)"
+           onclick="https://www.csee.umbc.edu/courses/471/papers/turing.pdf"><tspan
+             x="43.210644"
+             y="110.19003"
+             id="tspan64">GLAUBER</tspan></text>
+      </g>
+    </a>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text37"
+       transform="translate(57.361457,10.340737)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan65">Empirical laws
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan66">in chemistry</tspan></text>
+    <a
+       id="a38"
+       xlink:href="https://en.wikipedia.org/wiki/Cyc"
+       target="_blank"
+       transform="translate(104.9095,41.035705)"
+       xlink:title="1984- Lenat: CyC">
+      <g
+         id="g38"
+         transform="translate(3.6862116,-21.466761)">
+        <rect
+           style="fill:#87aade;stroke:none;stroke-width:0.657451;stroke-linecap:round;stroke-linejoin:round"
+           id="rect37"
+           width="44.337322"
+           height="7.6468711"
+           x="42.08709"
+           y="115.27616"
+           ry="2.3407974"
+           onclick="" />
+        <text
+           xml:space="preserve"
+           style="font-size:5.64444px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre-wrap;shape-inside:url(#rect37);display:inline;fill:#f9f9f9;stroke-width:0.264583"
+           x="33.229897"
+           y="108.85446"
+           id="text38"
+           transform="translate(14.482823,0.56478564)"
+           onclick=""><tspan
+             x="42.859245"
+             y="120.46151"
+             id="tspan67">CyC</tspan></text>
+      </g>
+    </a>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:Krungthep;-inkscape-font-specification:'Krungthep, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:52.661;display:inline;fill:#666666;stroke-width:0.198436"
+       x="31.745291"
+       y="178.96124"
+       id="text39"
+       transform="translate(120.3323,-30.934266)"><tspan
+         x="31.745291"
+         y="178.96124"
+         id="tspan68">Encoding all
+</tspan><tspan
+         x="31.745291"
+         y="184.2529"
+         id="tspan69">knowledge</tspan></text>
+  </g>
+</svg>
