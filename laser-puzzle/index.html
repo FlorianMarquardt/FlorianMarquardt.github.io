@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>Laser-Spiegel-Rätsel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-wrapper">
+        <div id="header">
+            <span id="level-name">First Light</span>
+            <span id="score-display">0</span>
+            <span id="best-display" style="display:none"></span>
+            <span id="move-counter">Züge: 0</span>
+            <button id="reset-btn">↺</button>
+            <button id="help-btn">?</button>
+        </div>
+        <div id="board-container">
+            <div id="grid"></div>
+            <canvas id="beam-canvas"></canvas>
+        </div>
+    </div>
+
+    <div id="help-overlay" class="hidden">
+        <div id="help-content">
+            <h2>Spielanleitung</h2>
+            <p class="help-goal">Lenke den Laserstrahl auf das Ziel <span class="hl-target">◎</span></p>
+            <div class="help-section">
+                <h3>Mobil</h3>
+                <ul>
+                    <li><b>Wischen</b> um den Hund zu bewegen</li>
+                    <li><b>Tippen</b> auf einen benachbarten Spiegel um ihn zu drehen</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h3>Desktop</h3>
+                <ul>
+                    <li><b>Pfeiltasten / WASD</b> zum Bewegen</li>
+                    <li><b>Klick</b> auf einen benachbarten Spiegel zum Drehen</li>
+                    <li><b>R</b> um das Level zurückzusetzen</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h3>Mechanik</h3>
+                <ul>
+                    <li>Laufe gegen einen Spiegel oder Block um ihn zu <b>schieben</b></li>
+                    <li>Spiegel lenken den Strahl ab — <span class="hl-mirror">╱</span> und <span class="hl-mirror">╲</span></li>
+                    <li>Lauf nicht in den Strahl!</li>
+                </ul>
+            </div>
+            <button id="help-close-btn">Verstanden</button>
+        </div>
+    </div>
+
+    <div id="overlay" class="hidden">
+        <div id="overlay-content">
+            <h2 id="overlay-title"></h2>
+            <p id="overlay-message"></p>
+            <button id="overlay-btn"></button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
